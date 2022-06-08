@@ -199,9 +199,9 @@ int textInput(unsigned char xpos, unsigned char ypos, char* str, unsigned char s
         case CH_ENTER:
             idx = strlen(str);
             str[idx] = 0;
-            gotoxy(xpos+1,ypos+1);
+            gotoxy(xpos,ypos);
             cspaces(size+1);
-            cputsxy(xpos+1, ypos+1, str);
+            cputsxy(xpos, ypos, str);
             return idx;
 
         case CH_DEL:
@@ -216,10 +216,10 @@ int textInput(unsigned char xpos, unsigned char ypos, char* str, unsigned char s
                     cputcxy(xpos+c,ypos,b? b : CH_SPACE);
                     if (b == 0) { break; }
                 }
-                gotoxy(xpos+idx+1, ypos+1);
+                gotoxy(xpos+idx, ypos);
                 cputc(str[idx] ? 128+str[idx] : CH_INVSPACE);
                 cputc(str[idx+1] ? str[idx+1] : CH_SPACE);
-                gotoxy(xpos+idx+1, ypos+1);
+                gotoxy(xpos+idx, ypos);
             }
             break;
 
@@ -227,10 +227,10 @@ int textInput(unsigned char xpos, unsigned char ypos, char* str, unsigned char s
             if (idx)
             {
                 --idx;
-                gotoxy(xpos+idx+1, ypos+1);
+                gotoxy(xpos+idx, ypos);
                 cputc(str[idx] ? 128+str[idx] : CH_INVSPACE);
                 cputc(str[idx+1] ? str[idx+1] : CH_SPACE);
-                gotoxy(xpos+idx+1, ypos+1);
+                gotoxy(xpos+idx, ypos);
 
             }
             break;
@@ -239,10 +239,10 @@ int textInput(unsigned char xpos, unsigned char ypos, char* str, unsigned char s
             if (idx < strlen(str) && idx < size)
             {
                 ++idx;
-                gotoxy(xpos+idx, ypos+1);
+                gotoxy(xpos+idx-1, ypos);
                 cputc(str[idx-1]);
                 cputc(str[idx] ? 128+str[idx] : CH_INVSPACE);
-                gotoxy(xpos + idx + 1, ypos+1);
+                gotoxy(xpos + idx, ypos);
             }
             break;
 
@@ -1208,6 +1208,357 @@ void movemode()
     if(showbar) { printstatusbar(); }
 }
 
+void selectmode()
+{
+    // Function to select a screen area to delete, cut, copy or paint
+
+    unsigned char key,movekey,y,ycount;
+
+    strcpy(programmode,"Select");
+
+    movekey = 0;
+    lineandbox(0);
+    if(select_accept == 0) { return; }
+
+    strcpy(programmode,"x/c/d/ipm?");
+
+    do
+    {
+        if(showbar) { printstatusbar(); }
+        key=cgetc();
+
+        // Toggle statusbar
+        if(key==CH_F6)
+        {
+            togglestatusbar();
+        }
+
+        if(key==CH_F8) { helpscreen_load(3); }
+
+    } while (key !='d' && key !='x' && key !='c' && key != 'p' && key !='i' && key !='m' && key != CH_ESC && key != CH_STOP );
+
+    if(key!=CH_ESC && key != CH_STOP)
+    {
+        if((key=='x' || key=='c')&&(select_width>1024))
+        {
+            messagepopup("Selection too big.",1);
+            return;
+        }
+
+        if(key=='x' || key=='c')
+        {
+            if(key=='x')
+            {
+                strcpy(programmode,"Cut");
+            }
+            else
+            {
+                strcpy(programmode,"Copy");
+            }
+            do
+            {
+                if(showbar) { printstatusbar(); }
+                movekey = cgetc();
+
+                switch (movekey)
+                {
+                // Cursor move
+                case CH_CURS_LEFT:
+                case CH_CURS_RIGHT:
+                case CH_CURS_UP:
+                case CH_CURS_DOWN:
+                    plotmove(movekey);
+                    break;
+
+                case CH_F8:
+                    helpscreen_load(3);
+                    break;
+
+                default:
+                    break;
+                }
+            } while (movekey != CH_ESC && movekey != CH_STOP && movekey != CH_ENTER);
+
+            if(movekey==CH_ENTER)
+            {
+                if((screen_col+xoffset+select_width>screenwidth) || (screen_row+yoffset+select_height>screenheight))
+                {
+                    messagepopup("Selection does not fit.",1);
+                    return;
+                }
+
+                for(ycount=0;ycount<select_height;ycount++)
+                {
+                    y=(screen_row+yoffset>=select_starty)? select_height-ycount-1 : ycount;
+                    memcpy((void*)SCREENMEMORY,(void*)screenmap_screenaddr(select_starty+y,select_startx,screenwidth),select_width);
+                    if(key=='x') {memset((void*)screenmap_screenaddr(select_starty+y,select_startx,screenwidth),CH_SPACE,select_width); }
+                    memcpy((void*)screenmap_screenaddr(screen_row+yoffset+y,screen_col+xoffset,screenwidth),(void*)SCREENMEMORY,select_width);
+                }
+            }
+        }
+
+        if( key=='d')
+        {
+            for(y=0;y<select_height;y++)
+            {
+                memset((void*)screenmap_screenaddr(select_starty+y,select_startx,screenwidth),CH_SPACE,select_width);
+            }
+        }
+
+        if(key=='i')
+        {
+            for(y=0;y<select_height;y++)
+            {
+                memset((void*)screenmap_screenaddr(select_starty+y,select_startx,screenwidth),plotink,select_width);
+            }
+        }
+
+        if(key=='p')
+        {
+            for(y=0;y<select_height;y++)
+            {
+                memset((void*)screenmap_screenaddr(select_starty+y,select_startx,screenwidth),16+plotpaper,select_width);
+            }
+        }
+
+        if(key=='m')
+        {
+            for(y=0;y<select_height;y++)
+            {
+                memset((void*)screenmap_screenaddr(select_starty+y,select_startx,screenwidth),ORIC_CharAttribute(plotaltchar,plotdouble,plotblink),select_width);
+            }
+        }
+
+        ORIC_CopyViewPort(SCREENMAPBASE,screenwidth,xoffset,yoffset,0,0,40,27);
+        if(showbar) { initstatusbar(); }
+        cputcxy(screen_col,screen_row,plotscreencode+128);
+    }
+    strcpy(programmode,"Main");
+}
+
+void resizewidth()
+{
+    // Function to resize screen canvas width
+
+    unsigned int newwidth = screenwidth;
+    unsigned int maxsize = MEMORYLIMIT - SCREENMAPBASE;
+    unsigned char areyousure = 0;
+    unsigned char sizechanged = 0;
+    unsigned int y;
+    char* ptrend;
+
+    windownew(2,5,12,35,0);
+
+    cputsxy(4,6,"Resize canvas width");
+    cputsxy(4,8,"Enter new width:");
+
+    sprintf(buffer,"%i",screenwidth);
+    textInput(4,9,buffer,4);
+    newwidth = (unsigned int)strtol(buffer,&ptrend,10);
+
+    if((newwidth*screenheight)  > maxsize || newwidth<40 )
+    {
+        cputsxy(4,11,"New size unsupported. Press key.");
+        cgetc();
+    }
+    else
+    {
+        if(newwidth < screenwidth)
+        {
+            cputsxy(4,11,"Shrinking might delete data.");
+            cputsxy(4,12,"Are you sure?");
+            areyousure = menupulldown(20,13,5,0);
+            if(areyousure==1)
+            {
+                for(y=0;y<screenheight;y++)
+                {
+                    memcpy((void*)SCREENMEMORY,(void*)screenmap_screenaddr(y,0,screenwidth),newwidth);
+                    memcpy((void*)screenmap_screenaddr(y,0,newwidth),(void*)SCREENMEMORY,newwidth);
+                }
+                if(screen_col>newwidth-1) { screen_col=newwidth-1; }
+                sizechanged = 1;
+            }
+        }
+        if(newwidth > screenwidth)
+        {
+            for(y=0;y<screenheight;y++)
+            {
+                memcpy((void*)SCREENMEMORY,(void*)screenmap_screenaddr(screenheight-y-1,0,screenwidth),screenwidth);
+                memcpy((void*)screenmap_screenaddr(screenheight-y-1,0,newwidth),(void*)SCREENMEMORY,screenwidth);
+                memset((void*)screenmap_screenaddr(screenheight-y-1,screenwidth,newwidth),A_STD,newwidth-screenwidth);
+            }
+            sizechanged = 1;
+        }
+    }
+
+    windowrestore(0);
+
+    if(sizechanged==1)
+    {
+        screenwidth = newwidth;
+        screentotal = screenwidth * screenheight;
+        xoffset = 0;
+        ORIC_CopyViewPort(SCREENMAPBASE,screenwidth,xoffset,yoffset,0,0,40,27);
+        sprintf(pulldownmenutitles[0][0],"Width:   %5i ",screenwidth);
+        menuplacebar();
+        if(showbar) { initstatusbar(); }
+        cputcxy(screen_col,screen_row,plotscreencode+128);
+    }
+}
+
+void resizeheight()
+{
+    // Function to resize screen camvas height
+
+    unsigned int newheight = screenheight;
+    unsigned int maxsize = MEMORYLIMIT - SCREENMAPBASE;
+    unsigned char areyousure = 0;
+    unsigned char sizechanged = 0;
+    unsigned char y;
+    char* ptrend;
+
+    windownew(2,5,12,36,0);
+
+    cputsxy(4,6,"Resize canvas height");
+    cputsxy(4,8,"Enter new height:");
+
+    sprintf(buffer,"%i",screenheight);
+    textInput(4,9,buffer,4);
+    newheight = (unsigned int)strtol(buffer,&ptrend,10);
+
+    if((newheight*screenwidth)  > maxsize || newheight < 27)
+    {
+        cputsxy(4,11,"New size unsupported. press key.");
+        cgetc();
+    }
+    else
+    {
+        if(newheight < screenheight)
+        {
+            cputsxy(4,11,"Shrinking might delete data.");
+            cputsxy(4,12,"Are you sure?");
+            areyousure = menupulldown(20,13,5,0);
+            if(areyousure==1)
+            {
+                memcpy((void*)screenmap_screenaddr(0,0,screenwidth),(void*)screenmap_screenaddr(0,0,screenwidth),screenheight*screenwidth);
+                if(screen_row>newheight-1) { screen_row=newheight-1; }
+                sizechanged = 1;
+            }
+        }
+        if(newheight > screenheight)
+        {
+            for(y=0;y<screenheight;y++)
+            {
+                memcpy((void*)screenmap_screenaddr(screenheight-y-1,0,screenwidth),(void*)screenmap_screenaddr(screenheight-y-1,0,screenwidth),screenwidth);
+            }
+            memset((void*)screenmap_screenaddr(screenheight,0,screenwidth),A_STD,(newheight-screenheight)*screenwidth);
+            sizechanged = 1;
+        }
+    }
+
+    windowrestore(0);
+
+    if(sizechanged==1)
+    {
+        screenheight = newheight;
+        screentotal = screenwidth * screenheight;
+        yoffset=0;
+        ORIC_CopyViewPort(SCREENMAPBASE,screenwidth,xoffset,yoffset,0,0,40,27);
+        sprintf(pulldownmenutitles[0][1],"Height:  %5i ",screenheight);
+        menuplacebar();
+        if(showbar) { initstatusbar(); }
+        cputcxy(screen_col,screen_row,plotscreencode+128);
+    }
+}
+
+void versioninfo()
+{
+    windownew(2,5,15,35,1);
+    cputsxy(4,6,"Version information and credits");
+    cputsxy(4,8,"ORIC Screen Editor");
+    cputsxy(4,9,"Written in 2022 by Xander Mol");
+    sprintf(buffer,"version: %s",version);
+    cputsxy(4,11,buffer);
+    cputsxy(4,13,"Source, docs and credits at:");
+    cputsxy(4,14,"github.com/xahmol/OricScreenEditor");
+    cputsxy(4,16,"(C) 2022, IDreamtIn8bits.com");
+    cputsxy(4,18,"Press a key to continue.");
+    cgetc();
+    windowrestore(0);
+}
+
+void mainmenuloop()
+{
+    // Function for main menu selection loop
+
+    unsigned char menuchoice;
+    
+    windowsave(0,1,1);
+
+    do
+    {
+        menuchoice = menumain();
+      
+        switch (menuchoice)
+        {
+        case 11:
+            resizewidth();
+            break;
+
+        case 12:
+            resizeheight();
+            break;
+
+        case 13:
+        case 14:
+            ORIC_ScreenmapFill(SCREENMAPBASE,screenwidth,screenheight,plotink,plotpaper,(menuchoice==13)?A_STD:plotscreencode);
+            windowrestore(0);
+            ORIC_CopyViewPort(SCREENMAPBASE,screenwidth,xoffset,yoffset,0,0,40,27);
+            windowsave(0,1,0);
+            menuplacebar();
+            if(showbar) { initstatusbar(); }
+            break;
+
+        //case 21:
+        //    savescreenmap();
+        //    break;
+
+        //case 22:
+        //    loadscreenmap();
+        //    break;
+        
+        //case 23:
+        //    saveproject();
+        //    break;
+        
+        //case 24:
+        //    loadproject();
+        //    break;
+        
+        //case 31:
+        //    loadcharset();
+        //    break;
+        
+        //case 32:
+        //    savecharset();
+        //    break;
+
+        case 41:
+            versioninfo();
+            break;
+
+        case 42:
+            appexit = 1;
+            menuchoice = 99;
+            break;
+
+        default:
+            break;
+        }
+    } while (menuchoice < 99);
+    
+    windowrestore(1);
+}
 
 // Main routine
 void main()
@@ -1372,9 +1723,9 @@ void main()
             break;
 
         // Select mode
-        //case 's':
-        //    selectmode();
-        //    break;
+        case 's':
+            selectmode();
+            break;
 
         // Try
         case 't':
@@ -1457,10 +1808,10 @@ void main()
             break;
 
         // Go to menu
-        //case CH_F1:
-        //    mainmenuloop();
-        //    cputcxy(screen_col,screen_row,plotscreencode);
-        //    break;
+        case CH_F1:
+            mainmenuloop();
+            cputcxy(screen_col,screen_row,plotscreencode);
+            break;
 
         // Toggle statusbar
         case CH_F6:
@@ -1468,9 +1819,9 @@ void main()
             break;
 
         // Help screen
-        //case CH_F8:
-        //    helpscreen_load(1);
-        //    break;
+        case CH_F8:
+            helpscreen_load(1);
+            break;
         
         default:
             // 0-9: Favourites select
