@@ -73,25 +73,32 @@ extern char version[22];
 #define CH_SPACE            0x20        // Screencode for space
 #define CH_INVSPACE         0xA0        // Inverse space
 #define CH_MINUS            0x2D        // Screencode for minus
-#define CH_BLACK            0x90        // Petscii control code for black           CTRL-1
-#define CH_WHITE            0x05        // Petscii control code for white           CTRL-2
-#define CH_RED              0x1C        // Petscii control code for red             CTRL-3
-#define CH_CYAN             0x9F        // Petscii control code for cyan            CTRL-4
-#define CH_PURPLE           0x9C        // Petscii control code for purple          CTRL-5
-#define CH_GREEN            0x1E        // Petscii control code for green           CTRL-6
-#define CH_BLUE             0x1F        // Petscii control code for blue            CTRL-7
-#define CH_YELLOW           0x9E        // Petscii control code for yellow          CTRL-8
-#define CH_RVSON            0x12        // Petscii control code for RVS ON          CTRL-9
-#define CH_RVSOFF           0x92        // Petscii control code for RVS OFF         CTRL-0
-#define CH_ORANGE           0x81        // Petscii control code for orange          C=-1
-#define CH_BROWN            0x95        // Petscii control code for brown           C=-2
-#define CH_YELGREEN         0x96        // Petscii control code for yellow green    C=-3
-#define CH_PINK             0x97        // Petscii control code for pink            C=-4
-#define CH_BLUEGREEN        0x98        // Petscii control code for blue green      C=-5
-#define CH_LBLUE            0x99        // Petscii control code for light blue      C=-6
-#define CH_DBLUE            0x9A        // Petscii control code for dark blue       C=-7
-#define CH_LGREEN           0x9B        // Petscii control code for light green     C=-8
-
+#define CH_CTRL_A           0x01        // Control+A
+#define CH_CTRL_B           0x02        // Control+B
+#define CH_CTRL_C           0x03        // Control+C
+#define CH_CTRL_D           0x04        // Control+D
+#define CH_CTRL_E           0x05        // Control+E
+#define CH_CTRL_F           0x06        // Control+F
+#define CH_CTRL_G           0x07        // Control+G
+#define CH_CTRL_H           0x08        // Control+H
+#define CH_CTRL_I           0x09        // Control+I
+#define CH_CTRL_J           0x0A        // Control+J
+#define CH_CTRL_K           0x0B        // Control+K
+#define CH_CTRL_L           0x0C        // Control+L
+#define CH_CTRL_M           0x0D        // Control+M
+#define CH_CTRL_N           0x0E        // Control+N
+#define CH_CTRL_O           0x0F        // Control+O
+#define CH_CTRL_P           0x10        // Control+P
+#define CH_CTRL_Q           0x11        // Control+Q
+#define CH_CTRL_R           0x12        // Control+R
+#define CH_CTRL_S           0x13        // Control+S
+#define CH_CTRL_T           0x14        // Control+T
+#define CH_CTRL_U           0x15        // Control+U
+#define CH_CTRL_V           0x16        // Control+V
+#define CH_CTRL_W           0x17        // Control+W
+#define CH_CTRL_X           0x18        // Control+X
+#define CH_CTRL_Y           0x19        // Control+Y
+#define CH_CTRL_Z           0x1A        // Control+Z
 
 /* Declaration global variables as externals */
 extern unsigned char bootdevice;

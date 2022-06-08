@@ -109,7 +109,7 @@ unsigned char rowsel = 0;
 unsigned char colsel = 0;
 unsigned char palettechar;
 unsigned char visualmap = 0;
-unsigned char favourites[10] = {31,31,31,31,31,31,31,31,31,31};
+unsigned char favourites[10] = {33,33,33,33,33,33,33,33,33,33};
 
 char buffer[81];
 char version[22];
@@ -157,7 +157,7 @@ void charset_swap(unsigned char sysorred)
     }
 }
 
-unsigned int screenmap_screenaddr(unsigned char row, unsigned char col, unsigned int width, unsigned int height)
+unsigned int screenmap_screenaddr(unsigned char row, unsigned char col, unsigned int width)
 {
     // Function to calculate screenmap address for the character space
     // Input: row, col, width and height for screenmap
@@ -360,7 +360,7 @@ void printstatusbar()
     sprintf(buffer,"%2x",plotscreencode);
     cputsxy(21,26,buffer);
     cputcxy(23,26,plotscreencode);
-    sprintf(buffer,"%2x",PEEK(screenmap_screenaddr(screen_row+yoffset,screen_col+xoffset,screenwidth,screenheight)));
+    sprintf(buffer,"%2x",PEEK(screenmap_screenaddr(screen_row+yoffset,screen_col+xoffset,screenwidth)));
     cputsxy(26,26,buffer);
     sprintf(buffer,"%1u",plotink);
     cputsxy(30,26,buffer);
@@ -737,7 +737,7 @@ void screenmapplot(unsigned char row, unsigned char col, unsigned char screencod
     // Function to plot a screencode
 	// Input: row and column, screencode to plot
 
-    POKE(screenmap_screenaddr(row,col,screenwidth,screenheight),screencode);
+    POKE(screenmap_screenaddr(row,col,screenwidth),screencode);
 }
 
 void cursormove(unsigned char left, unsigned char right, unsigned char up, unsigned char down)
@@ -856,7 +856,7 @@ void plotmove(unsigned char direction)
     // Drive cursor move
     // Input: ASCII code of cursor key pressed
 
-    cputcxy(screen_col,screen_row,PEEK(screenmap_screenaddr(yoffset+screen_row,xoffset+screen_col,screenwidth,screenheight)));
+    cputcxy(screen_col,screen_row,PEEK(screenmap_screenaddr(yoffset+screen_row,xoffset+screen_col,screenwidth)));
 
     switch (direction)
     {
@@ -897,6 +897,317 @@ void plot_try()
     }
     strcpy(programmode,"Main");
 }
+
+void writemode()
+{
+    // Write mode with screencodes
+
+    unsigned char key, screencode;
+    unsigned char rvs = 0;
+
+    strcpy(programmode,"Write");
+
+    do
+    {
+        if(showbar) { printstatusbar(); }
+        key = cgetc();
+
+        switch (key)
+        {
+        // Cursor move
+        case CH_CURS_LEFT:
+        case CH_CURS_RIGHT:
+        case CH_CURS_UP:
+        case CH_CURS_DOWN:
+            plotmove(key);
+            break;
+
+        // Toggle blink
+        case CH_CTRL_B:
+            plotblink = (plotblink==0)? 1:0;
+            break;
+
+        // Toggle alternate character set
+        case CH_CTRL_A:
+            plotaltchar = (plotaltchar==0)? 1:0;
+            break;
+
+        // Toggle double
+        case CH_CTRL_D:
+            plotdouble = (plotdouble==0)? 1:0;
+            break;
+
+        // Decrease ink
+        case CH_CTRL_Z:
+            if(plotink==0) { plotink = 7; } else { plotink--; }
+            break;
+
+        // Increase ink
+        case CH_CTRL_X:
+            if(plotink==7) { plotink = 0; } else { plotink++; }
+            break;
+
+        // Decrease paper
+        case CH_CTRL_C:
+            if(plotpaper==0) { plotpaper = 7; } else { plotpaper--; }
+            break;
+
+        // Increase paper
+        case CH_CTRL_V:
+            if(plotpaper==7) { plotpaper = 0; } else { plotpaper++; }
+            break;
+
+        // Plot present ink
+        case CH_F1:
+            screenmapplot(screen_row+yoffset,screen_col+xoffset,plotink);
+            plotmove(CH_CURS_RIGHT);
+            break;
+
+        // Plot present paper
+        case CH_F2:
+            screenmapplot(screen_row+yoffset,screen_col+xoffset,16+plotpaper);
+            plotmove(CH_CURS_RIGHT);
+            break;
+
+        // Plot present character modifier
+        case CH_F3:
+            screenmapplot(screen_row+yoffset,screen_col+xoffset,ORIC_CharAttribute(plotaltchar,plotdouble,plotblink));
+            plotmove(CH_CURS_RIGHT);
+            break;
+
+        // Delete present screencode and attributes
+        case CH_DEL:
+            screenmapplot(screen_row+yoffset,screen_col+xoffset,CH_SPACE);
+            cputcxy(screen_row,screen_col,CH_SPACE);
+            break;
+
+        // Toggle statusbar
+        case CH_F6:
+            togglestatusbar();
+            break;
+
+        case CH_F8:
+            helpscreen_load(4);
+            break;
+
+        // Toggle RVS with the RVS ON and RVS OFF keys (control 9 and control 0)
+        case CH_CTRL_R:
+            rvs = (rvs==1)?0:1;
+            break;
+
+        // Write printable character                
+        default:
+            if(isprint(key))
+            {
+                screencode = key+(rvs*128);
+                screenmapplot(screen_row+yoffset,screen_col+xoffset,screencode);
+                plotmove(CH_CURS_RIGHT);
+            }
+            break;
+        }
+    } while (key != CH_ESC && key != CH_STOP);
+    strcpy(programmode,"Main");
+}
+
+void plotvisible(unsigned char row, unsigned char col, unsigned char setorrestore)
+{
+    // Plot or erase part of line or box if in visible viewport
+    // Input: row, column, and flag setorrestore to plot new value (1) or restore old value (0)
+
+
+    if(row>=yoffset && row<=yoffset+26 && col>=xoffset && col<=xoffset+39)
+    {
+        if(setorrestore==1)
+        {
+            cputcxy(col-xoffset,row-yoffset,plotscreencode);
+        }
+        else
+        {
+            cputcxy(col-xoffset,row-yoffset, PEEK(screenmap_screenaddr(row,col,screenwidth)));
+        }
+    }
+}
+
+void lineandbox(unsigned char draworselect)
+{
+    // Select line or box from upper left corner using cursor keys, ESC for cancel and ENTER for accept
+    // Input: draworselect: Choose select mode (0) or draw mode (1)
+
+    unsigned char key;
+    unsigned char x,y;
+
+    select_startx = screen_col + xoffset;
+    select_starty = screen_row + yoffset;
+    select_endx = select_startx;
+    select_endy = select_starty;
+    select_accept = 0;
+
+    if(draworselect)
+    {
+        strcpy(programmode,"Line/Box");
+    }
+    cputcxy(screen_col,screen_row,plotscreencode);
+
+    do
+    {
+        if(showbar) { printstatusbar(); }
+        key = cgetc();
+
+        switch (key)
+        {
+        case CH_CURS_RIGHT:
+            cursormove(0,1,0,0);
+            select_endx = screen_col + xoffset;
+            for(y=select_starty;y<select_endy+1;y++)
+            {
+                plotvisible(y,select_endx,1);
+            }
+            break;
+
+        case CH_CURS_LEFT:
+            if(select_endx>select_startx)
+            {
+                cursormove(1,0,0,0);
+                for(y=select_starty;y<select_endy+1;y++)
+                {
+                    plotvisible(y,select_endx,0);
+                }
+                select_endx = screen_col + xoffset;
+            }
+            break;
+
+        case CH_CURS_UP:
+            if(select_endy>select_starty)
+            {
+                cursormove(0,0,1,0);
+                for(x=select_startx;x<select_endx+1;x++)
+                {
+                    plotvisible(select_endy,x,0);
+                }
+                select_endy = screen_row + yoffset;
+            }
+            break;
+
+        case CH_CURS_DOWN:
+            cursormove(0,0,0,1);
+            select_endy = screen_row + yoffset;
+            for(x=select_startx;x<select_endx+1;x++)
+            {
+                plotvisible(select_endy,x,1);
+            }
+            break;
+
+        // Toggle statusbar
+        case CH_F6:
+            togglestatusbar();
+            break;
+        
+        case CH_F8:
+            if(select_startx==select_endx && select_starty==select_endy) helpscreen_load(3);
+            break;
+        
+        default:
+            break;
+        }
+    } while (key!=CH_ESC && key != CH_STOP && key != CH_ENTER);
+
+    if(key==CH_ENTER)
+    {
+        select_width = select_endx-select_startx+1;
+        select_height = select_endy-select_starty+1;
+    }  
+
+    if(key==CH_ENTER && draworselect ==1)
+    {
+        for(y=select_starty;y<select_endy+1;y++)
+        {
+            memset((void*)screenmap_screenaddr(y,select_startx,screenwidth),plotscreencode,select_width);
+        }
+        cputcxy(screen_col,screen_row,plotscreencode+128);
+    }
+    else
+    {
+        ORIC_CopyViewPort(SCREENMAPBASE,screenwidth,xoffset,yoffset,0,0,40,27);
+        if(showbar) { initstatusbar(); }
+        if(key==CH_ENTER) { select_accept=1; }
+        cputcxy(screen_col,screen_row,plotscreencode+128);
+    }
+    if(draworselect ||key!=CH_ESC || key != CH_STOP )
+    {
+        strcpy(programmode,"Main");
+    }
+}
+
+void movemode()
+{
+    // Function to move the 80x25 viewport
+
+    unsigned char key,y;
+    unsigned char moved = 0;
+
+    strcpy(programmode,"Move");
+
+    cputcxy(screen_col,screen_row,PEEK(screenmap_screenaddr(yoffset+screen_row,xoffset+screen_col,screenwidth)));
+    
+    if(showbar) { hidestatusbar(); }
+
+    do
+    {
+        key = cgetc();
+
+        switch (key)
+        {
+        case CH_CURS_RIGHT:
+            ORIC_ScrollMove(0,0,40,27,2,1);
+            ORIC_VChar(0,0,CH_SPACE,27);
+            moved=1;
+            break;
+        
+        case CH_CURS_LEFT:
+            ORIC_ScrollMove(0,0,40,27,1,1);
+            ORIC_VChar(0,39,CH_SPACE,27);
+            moved=1;
+            break;
+
+        case CH_CURS_UP:
+            ORIC_ScrollMove(0,0,40,27,8,1);
+            ORIC_HChar(24,0,CH_SPACE,40);
+            moved=1;
+            break;
+        
+        case CH_CURS_DOWN:
+            ORIC_ScrollMove(0,0,40,27,4,1);
+            ORIC_HChar(0,0,CH_SPACE,40);
+            moved=1;
+            break;
+
+        case CH_F8:
+            helpscreen_load(3);
+            break;
+        
+        default:
+            break;
+        }
+    } while (key != CH_ENTER && key != CH_ESC && key != CH_STOP);
+
+    if(moved==1)
+    {
+        if(key==CH_ENTER)
+        {
+            for(y=0;y<25;y++)
+            {
+                memcpy((void*)screenmap_screenaddr(y+yoffset,xoffset,screenwidth),(void*)(SCREENMEMORY+(y*40)),40);
+            }
+        }
+        ORIC_CopyViewPort(SCREENMAPBASE,screenwidth,xoffset,yoffset,0,0,40,27);
+        if(showbar) { initstatusbar(); }
+    }
+
+    cputcxy(screen_col,screen_row,plotscreencode+128);
+    strcpy(programmode,"Main");
+    if(showbar) { printstatusbar(); }
+}
+
 
 // Main routine
 void main()
@@ -984,13 +1295,13 @@ void main()
         
         // Increase screencode
         case '=':
-            if(plotscreencode==126) { plotscreencode=32; } else { plotscreencode++; }
+            if(plotscreencode==127) { plotscreencode=32; } else { plotscreencode++; }
             cputcxy(screen_col,screen_row,plotscreencode+128);
             break;
 
         // Decrease screencode
         case '-':
-            if(plotscreencode==32) { plotscreencode=126; } else { plotscreencode--; }
+            if(plotscreencode==32) { plotscreencode=127; } else { plotscreencode--; }
             cputcxy(screen_col,screen_row,plotscreencode+128);
             break;
         
@@ -1041,29 +1352,24 @@ void main()
 
         // Grab underlying character and attributes
         case 'g':
-            plotscreencode = PEEK(screenmap_screenaddr(screen_row+yoffset,screen_col+xoffset,screenwidth,screenheight));
+            plotscreencode = PEEK(screenmap_screenaddr(screen_row+yoffset,screen_col+xoffset,screenwidth));
             cputcxy(screen_col,screen_row,plotscreencode+128);
             break;
 
         // Write mode: type in screencodes
-        //case 'w':
-        //    writemode();
-        //    break;
-        
-        // Color mode: type colors
-        //case 'c':
-        //    colorwrite();
-        //    break;
+        case 'w':
+            writemode();
+            break;
 
         // Line and box mode
-        //case 'l':
-        //    lineandbox(1);
-        //    break;
+        case 'l':
+            lineandbox(1);
+            break;
 
         // Move mode
-        //case 'm':
-        //    movemode();
-        //    break;
+        case 'm':
+            movemode();
+            break;
 
         // Select mode
         //case 's':
@@ -1099,7 +1405,7 @@ void main()
             break;
 
         // Plot present character modifier
-        case 'm':
+        case 'u':
             screenmapplot(screen_row+yoffset,screen_col+xoffset,ORIC_CharAttribute(plotaltchar,plotdouble,plotblink));
             plotmove(CH_CURS_RIGHT);
             break;
@@ -1107,6 +1413,47 @@ void main()
         // Delete present screencode and attributes
         case CH_DEL:
             screenmapplot(screen_row+yoffset,screen_col+xoffset,CH_SPACE);
+            break;
+
+        // Store to favourites with SHIFT+0-9
+        case 33:
+            favourites[1] = plotscreencode;
+            break;
+
+        case 64:
+            favourites[2] = plotscreencode;
+            break;
+
+        case 35:
+            favourites[3] = plotscreencode;
+            break;
+
+        case 36:
+            favourites[4] = plotscreencode;
+            break;
+
+        case 37:
+            favourites[5] = plotscreencode;
+            break;
+
+        case 94:
+            favourites[6] = plotscreencode;
+            break;
+
+        case 38:
+            favourites[7] = plotscreencode;
+            break;
+
+        case 42:
+            favourites[8] = plotscreencode;
+            break;
+
+        case 40:
+            favourites[9] = plotscreencode;
+            break;
+
+        case 41:
+            favourites[0] = plotscreencode;
             break;
 
         // Go to menu
@@ -1131,11 +1478,6 @@ void main()
             {
                 plotscreencode = favourites[key-48];
                 cputcxy(screen_col,screen_row,plotscreencode+128);
-            }
-            // Shift 1-9 or *: Store present character in favourites slot
-            if(key>32 && key<43)
-            {
-                favourites[key-33] = plotscreencode;
             }
             break;
         }
