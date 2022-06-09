@@ -1019,7 +1019,7 @@ void plotvisible(unsigned char row, unsigned char col, unsigned char setorrestor
     {
         if(setorrestore==1)
         {
-            cputcxy(col-xoffset,row-yoffset,plotscreencode);
+            cputcxy(col-xoffset,row-yoffset,plotscreencode+128);
         }
         else
         {
@@ -1046,7 +1046,7 @@ void lineandbox(unsigned char draworselect)
     {
         strcpy(programmode,"Line/Box");
     }
-    cputcxy(screen_col,screen_row,plotscreencode);
+    cputcxy(screen_col,screen_row,plotscreencode+128);
 
     do
     {
@@ -1123,6 +1123,8 @@ void lineandbox(unsigned char draworselect)
         {
             memset((void*)screenmap_screenaddr(y,select_startx,screenwidth),plotscreencode,select_width);
         }
+        ORIC_CopyViewPort(SCREENMAPBASE,screenwidth,xoffset,yoffset,0,0,40,27);
+        if(showbar) { initstatusbar(); }
         cputcxy(screen_col,screen_row,plotscreencode+128);
     }
     else
@@ -1746,19 +1748,19 @@ void main()
         // Plot present ink
         case 'i':
             screenmapplot(screen_row+yoffset,screen_col+xoffset,plotink);
-            plotmove(CH_CURS_RIGHT);
+            plotmove(CH_CURS_DOWN);
             break;
 
         // Plot present paper
         case 'o':
             screenmapplot(screen_row+yoffset,screen_col+xoffset,16+plotpaper);
-            plotmove(CH_CURS_RIGHT);
+            plotmove(CH_CURS_DOWN);
             break;
 
         // Plot present character modifier
         case 'u':
             screenmapplot(screen_row+yoffset,screen_col+xoffset,ORIC_CharAttribute(plotaltchar,plotdouble,plotblink));
-            plotmove(CH_CURS_RIGHT);
+            plotmove(CH_CURS_DOWN);
             break;
 
         // Delete present screencode and attributes
