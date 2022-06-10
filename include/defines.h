@@ -6,7 +6,6 @@
 #define MEMORYLIMIT         0xA8FF      // Upper memory limit address for screen map
 #define WINDOWBASEADDRESS   0xA900      // Base address for windows system data, 2k reserved
 #define CHARSET_SWAP        0xB100      // Base address for system character set
-#define VISUALCHAR          0xB400      // Visual charset map data
 #define CHARSET_STD         0xB500      // Base address for redefined charset
 #define CHARSET_ALT         0xB900      // Base address for redefined charset
 #define SCREENMEMORY        0xBB80      // Screen memory base address
@@ -44,7 +43,7 @@ extern char pulldownmenutitles[5][4][16];
 // Global variables
 extern unsigned char charsetchanged[2];
 extern unsigned char appexit;
-extern char filename[21];
+extern char filename[10];
 extern char programmode[11];
 extern unsigned char showbar;
 extern unsigned char screen_col;
@@ -68,6 +67,8 @@ extern unsigned char visualmap;
 extern unsigned char favourites[10];
 extern char buffer[81];
 extern char version[22];
+
+extern unsigned char visualchar[80];
 
 /* Char defines */
 #define CH_SPACE            0x20        // Screencode for space

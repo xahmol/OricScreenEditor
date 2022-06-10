@@ -114,16 +114,6 @@ unsigned char favourites[10] = {33,33,33,33,33,33,33,33,33,33};
 char buffer[81];
 char version[22];
 
-// Visual charset data
-unsigned char visualchar[80] =
-{
-    0x37,0x4B,0x33,0x43,0x3F,0x4F,0x27,0x2B,0x3C,0x4C,0x40,0x30,0x48,0x34,0x24,0x28,
-    0x55,0x5A,0x51,0x52,0x5D,0x5E,0x54,0x58,0x2D,0x2E,0x22,0x21,0x2A,0x25,0x53,0x5F,
-    0x36,0x49,0x26,0x29,0x56,0x59,0x57,0x5B,0x3D,0x4E,0x32,0x41,0x50,0x5C,0x2C,0x2F,
-    0x45,0x3A,0x44,0x38,0x47,0x3B,0x46,0x39,0x3E,0x4D,0x31,0x42,0x23,0x35,0x4A,0x20,
-    0x60,0x61,0x62,0x63,0x64,0x65,0x66,0x67,0x68,0x69,0x6A,0x6B,0x6C,0x6D,0x6E,0x6F
-};
-
 /* General screen functions */
 void cspaces(unsigned char number)
 {
@@ -177,7 +167,7 @@ unsigned int screenmap_screenaddr(unsigned char row, unsigned char col, unsigned
 
 
 // Generic routines
-int textInput(unsigned char xpos, unsigned char ypos, char* str, unsigned char size,unsigned char validation)
+int textInput(unsigned char xpos, unsigned char ypos, char* str, unsigned char size)
 {
 
     /**
@@ -191,15 +181,9 @@ int textInput(unsigned char xpos, unsigned char ypos, char* str, unsigned char s
     * @return -1 if input was aborted.
     * @return >= 0 length of edited string @p str.
     */
-    // Added input: Validation  =   0   All printable characters allowed
-    //                          +   1   Numbers allowed only
-    //                          +   2   Also alphabet allowed (lower and uppercase)
-    //                          +   4   Also wildcards * and ? allowed
-    //                          Add numbers to combine or 0 for no validation
 
     register unsigned char c;
     register unsigned char idx = strlen(str);
-    register unsigned char valid=0;;
 
     cputsxy(xpos,ypos,str);
     cputc(CH_INVSPACE);
@@ -263,13 +247,7 @@ int textInput(unsigned char xpos, unsigned char ypos, char* str, unsigned char s
             break;
 
         default:
-            valid=0;
-            if(!validation) { valid = 1; }
-            if((validation&1) && c>47 && c<58) { valid = 1; }
-            if((validation&2) && c>64 && c<91) { valid = 1; }
-            if((validation&2) && c>96 && c<123) { valid = 1; }
-            if((validation&4) && (c==42 || c==63)) { valid = 1; }
-            if (isprint(c) && idx < size && valid)
+            if (isprint(c) && idx < size)
             {
                 unsigned char flag = (str[idx] == 0);
                 str[idx] = c;
@@ -440,7 +418,6 @@ void windownew(unsigned char xpos, unsigned char ypos, unsigned char height, uns
     windowsave(ypos, height,loadsyscharset);
 
     ORIC_FillArea(ypos,xpos,CH_SPACE,width,height);
-    ORIC_VChar(ypos,xpos-1,A_STD,height);
     ORIC_VChar(ypos,xpos,A_BGWHITE,height);
     ORIC_VChar(ypos,xpos+1,A_FWBLACK,height);
 }
@@ -480,8 +457,7 @@ unsigned char menupulldown(unsigned char xpos, unsigned char ypos, unsigned char
     windowsave(ypos, pulldownmenuoptions[menunumber-1],0);
     for(x=0;x<pulldownmenuoptions[menunumber-1];x++)
     {
-        gotoxy(xpos-1,ypos+x);
-        cputc(A_STD);
+        gotoxy(xpos,ypos+x);
         cputc(A_BGCYAN);
         cputc(A_FWBLACK);
         cprintf(" %s",pulldownmenutitles[menunumber-1][x]);
@@ -490,8 +466,7 @@ unsigned char menupulldown(unsigned char xpos, unsigned char ypos, unsigned char
   
     do
     {
-        gotoxy(xpos-1,ypos+menuchoice-1);
-        cputc(A_STD);
+        gotoxy(xpos,ypos+menuchoice-1);
         cputc(A_BGYELLOW);
         cputc(A_FWBLACK);
         cprintf("-%s",pulldownmenutitles[menunumber-1][menuchoice-1]);
@@ -525,8 +500,7 @@ unsigned char menupulldown(unsigned char xpos, unsigned char ypos, unsigned char
 
         case CH_CURS_DOWN:
         case CH_CURS_UP:
-            gotoxy(xpos-1,ypos+menuchoice-1);
-            cputc(A_STD);
+            gotoxy(xpos,ypos+menuchoice-1);
             cputc(A_BGCYAN);
             cputc(A_FWBLACK);
             cprintf(" %s",pulldownmenutitles[menunumber-1][menuchoice-1]);
@@ -1286,187 +1260,6 @@ void selectmode()
     strcpy(programmode,"Main");
 }
 
-void palette_draw()
-{
-    // Draw window for character palette
-    unsigned char x,y;
-    unsigned char counter = 0;
-
-    windowsave(0,25,0);
-    ORIC_FillArea(0,3,CH_SPACE,37,25);
-    ORIC_VChar(0,0,A_STD,25);
-    cputcxy(7,2,A_ALT);
-    ORIC_VChar(15,7,A_ALT,10);
-    ORIC_VChar(0,1,A_BGWHITE,25);
-    ORIC_VChar(0,2,A_FWBLACK,25);
-    cputsxy(3,1,"Fav:");
-    cputsxy(3,3,"Std:");
-    cputsxy(3,15,"Alt:");
-
-    // Set coordinate of present char if no visual map
-    rowsel = palettechar/16+1;
-    colsel = palettechar%16;
-
-    // Favourites palette
-    for(x=0;x<10;x++)
-    {
-        cputcxy(8+x*2,1,favourites[x]);
-        cputcxy(8+x*2,2,favourites[x]);
-    }
-
-    // Full charsets
-    for(y=0;y<6;y++)
-    {
-        for(x=0;x<16;x++)
-        {
-            cputcxy(8+x*2,3+y*2,counter+32);
-            if(y<5)
-            {
-                cputcxy(8+x*2,15+y*2,(visualmap)?visualchar[counter]:counter+32);
-            }
-            counter++;
-        }
-    }
-}
-
-unsigned char palette_returnscreencode()
-{
-    // Get screencode from palette position
-    unsigned char palpos;
-
-    if(rowsel==0)
-    {
-        palpos = favourites[colsel];
-    }
-    if(rowsel>0 && rowsel<7)
-    {
-        palpos = 32 + colsel + (rowsel-1)*16;
-    }
-    if(rowsel>6)
-    {
-        if(visualmap)
-        {
-            palpos = visualchar[colsel+(rowsel-7)*16];
-        }
-        else
-        {
-            palpos = 32 + colsel + (rowsel-7)*16;
-        }
-    }
-
-    return palpos;
-}
-
-void palette()
-{
-    // Show character set palette
-
-    unsigned char key;
-
-    palettechar = plotscreencode-32;
-
-    strcpy(programmode,"Palette");
-
-    palette_draw();
-
-    // Get key loop
-    do
-    {
-        cputcxy(8+colsel*2,1+rowsel*2,palette_returnscreencode()+128);
-        if(showbar) { printstatusbar(); }
-        key=cgetc();
-
-        switch (key)
-        {
-        // Cursor movemeny
-        case CH_CURS_RIGHT:       
-        case CH_CURS_LEFT:
-        case CH_CURS_DOWN:
-        case CH_CURS_UP:
-            cputcxy(8+colsel*2,1+rowsel*2,palette_returnscreencode());
-            if(key==CH_CURS_RIGHT) { colsel++; }
-            if(key==CH_CURS_LEFT)
-            {
-                if(colsel>0)
-                {
-                    colsel--;
-                }
-                else
-                {
-                    colsel=15;
-                    if(rowsel>0)
-                    {
-                        rowsel--;
-                        if(rowsel==0) { colsel=9; }
-                    }
-                    else
-                    {
-                        rowsel=11;
-                    }
-                }
-            }
-            if(key==CH_CURS_DOWN) { rowsel++; }
-            if(key==CH_CURS_UP)
-            {
-                if(rowsel>0)
-                {
-                    rowsel--;
-                }
-                else
-                {
-                    rowsel=11;
-                }
-            }
-            if(colsel>9 && rowsel==0) { colsel=0; rowsel=1; }
-            if(colsel>15) { colsel=0; rowsel++; }
-            if(rowsel>11) { rowsel=0; }
-            break;
-
-        // Select character
-        case CH_SPACE:
-        case CH_ENTER:
-            plotscreencode = palette_returnscreencode();;
-            key = CH_ESC;
-            break;
-
-        // Toggle visual charset map
-        case 'v':
-            windowrestore(0);
-            visualmap = (visualmap)?0:1;
-            palette_draw();
-            break;
-
-        // Toggle statusbar
-        case CH_F6:
-            togglestatusbar();
-            break;
-
-        // Help screen
-        case CH_F8:
-            windowrestore(0);
-            helpscreen_load(2);
-            palette_draw();
-            break;
-        
-        default:
-            // Store in favourites
-            if(key>47 && key<58 && rowsel>0)
-            {
-                palettechar=palette_returnscreencode()-32;
-                favourites[key-48] = palettechar+32;
-                cputcxy(8+(key-48)*2,1,favourites[key-48]);
-                cputcxy(8+(key-48)*2,2,favourites[key-48]);
-            }
-            break;
-        }
-    } while (key != CH_ESC && key != CH_STOP);
-
-    windowrestore(0);
-    cputcxy(screen_col,screen_row,plotscreencode+128);
-    strcpy(programmode,"Main");
-}
-
-
 void resizewidth()
 {
     // Function to resize screen canvas width
@@ -1478,13 +1271,13 @@ void resizewidth()
     unsigned int y;
     char* ptrend;
 
-    windownew(2,5,12,38,0);
+    windownew(2,5,12,35,0);
 
     cputsxy(4,6,"Resize canvas width");
     cputsxy(4,8,"Enter new width:");
 
     sprintf(buffer,"%i",screenwidth);
-    textInput(4,9,buffer,4,1);
+    textInput(4,9,buffer,4);
     newwidth = (unsigned int)strtol(buffer,&ptrend,10);
 
     if((newwidth*screenheight)  > maxsize || newwidth<40 )
@@ -1516,7 +1309,7 @@ void resizewidth()
             {
                 memcpy((void*)SCREENMEMORY,(void*)screenmap_screenaddr(screenheight-y-1,0,screenwidth),screenwidth);
                 memcpy((void*)screenmap_screenaddr(screenheight-y-1,0,newwidth),(void*)SCREENMEMORY,screenwidth);
-                memset((void*)screenmap_screenaddr(screenheight-y-1,screenwidth,newwidth),CH_SPACE,newwidth-screenwidth);
+                memset((void*)screenmap_screenaddr(screenheight-y-1,screenwidth,newwidth),A_STD,newwidth-screenwidth);
             }
             sizechanged = 1;
         }
@@ -1548,13 +1341,13 @@ void resizeheight()
     unsigned char y;
     char* ptrend;
 
-    windownew(2,5,12,38,0);
+    windownew(2,5,12,36,0);
 
     cputsxy(4,6,"Resize canvas height");
     cputsxy(4,8,"Enter new height:");
 
     sprintf(buffer,"%i",screenheight);
-    textInput(4,9,buffer,4,1);
+    textInput(4,9,buffer,4);
     newheight = (unsigned int)strtol(buffer,&ptrend,10);
 
     if((newheight*screenwidth)  > maxsize || newheight < 27)
@@ -1582,7 +1375,7 @@ void resizeheight()
             {
                 memcpy((void*)screenmap_screenaddr(screenheight-y-1,0,screenwidth),(void*)screenmap_screenaddr(screenheight-y-1,0,screenwidth),screenwidth);
             }
-            memset((void*)screenmap_screenaddr(screenheight,0,screenwidth),CH_SPACE,(newheight-screenheight)*screenwidth);
+            memset((void*)screenmap_screenaddr(screenheight,0,screenwidth),A_STD,(newheight-screenheight)*screenwidth);
             sizechanged = 1;
         }
     }
@@ -1604,7 +1397,7 @@ void resizeheight()
 
 void versioninfo()
 {
-    windownew(2,5,15,38,1);
+    windownew(2,5,15,35,1);
     cputsxy(4,6,"Version information and credits");
     cputsxy(4,8,"ORIC Screen Editor");
     cputsxy(4,9,"Written in 2022 by Xander Mol");
@@ -1618,18 +1411,18 @@ void versioninfo()
     windowrestore(0);
 }
 
-int chooseidandfilename(char* headertext, unsigned char maxlen, unsigned char validation)
+int chooseidandfilename(char* headertext, unsigned char maxlen)
 {
     // Function to present dialogue to enter device id and filename
     // Input: Headertext to print, maximum length of filename input string
 
     unsigned char valid = 0;
 
-    windownew(2,5,12,38,0);
+    windownew(2,5,12,35,0);
     cputsxy(4,6,headertext);
 
     cputsxy(4,8,"Choose filename:            ");
-    valid = textInput(4,9,filename,maxlen,validation);
+    valid = textInput(4,9,filename,maxlen);
     return valid;
 }
 
@@ -1644,18 +1437,18 @@ void loadscreenmap()
     int rc;
     int len = 0;
   
-    escapeflag = chooseidandfilename("Load screen",9,7);
+    escapeflag = chooseidandfilename("Load screen",15);
 
     if(escapeflag==-1) { windowrestore(0); return; }
 
     cputsxy(4,10,"Enter screen width:");
     sprintf(buffer,"%i",screenwidth);
-    textInput(4,11,buffer,4,1);
+    textInput(4,11,buffer,4);
     newwidth = (unsigned int)strtol(buffer,&ptrend,10);
 
     cputsxy(4,12,"Enter screen height:");
     sprintf(buffer,"%i",screenheight);
-    textInput(4,13,buffer,4,1);
+    textInput(4,13,buffer,4);
     newheight = (unsigned int)strtol(buffer,&ptrend,10);
 
     if((newwidth*newheight)  > maxsize || newwidth<40 || newheight<27)
@@ -1668,8 +1461,7 @@ void loadscreenmap()
     {
         windowrestore(0);
 
-        sprintf(buffer,"%s.scr",filename);
-        rc=loadfile(buffer,(void*)SCREENMAPBASE,&len);
+        rc=loadfile(filename,(void*)SCREENMAPBASE,&len);
 
         if(len)
         {
@@ -1691,14 +1483,13 @@ void savescreenmap()
     int rc;
     int len = 0;
   
-    escapeflag = chooseidandfilename("Save screen",9,3);
+    escapeflag = chooseidandfilename("Save screen",15);
 
     windowrestore(0);
 
     if(escapeflag==-1) { return; }
 
-    sprintf(buffer,"%s.scr",filename);
-    rc = savefile(buffer,(void*)SCREENMAPBASE,screenwidth*screenheight);
+    rc = savefile(filename,(void*)SCREENMAPBASE,screenwidth*screenheight);
     
     if(rc) { fileerrormessage(rc,0); }
 }
@@ -1709,9 +1500,10 @@ void saveproject()
     int rc;
     int len = 0;
     char projbuffer[19];
+    char tempfilename[21];
     int escapeflag;
   
-    escapeflag = chooseidandfilename("Save project",9,3);
+    escapeflag = chooseidandfilename("Save project",10);
 
     windowrestore(0);
 
@@ -1737,21 +1529,21 @@ void saveproject()
     projbuffer[17] = xoffset;
     projbuffer[18] = yoffset;
 
-    sprintf(buffer,"%s.prj",filename);
+    sprintf(buffer,"%sproj",filename);
 
     rc = savefile(buffer,(void*)projbuffer,19);
 
     if(rc) { fileerrormessage(rc,0); }
 
     // Store screen data
-    sprintf(buffer,"%s.scr",filename);
+    sprintf(buffer,"%sscrn",filename);
     rc = savefile(buffer,(void*)SCREENMAPBASE,screenwidth*screenheight);
     if(rc) { fileerrormessage(rc,0); }
 
     // Store standard charset
     if(charsetchanged[0]==1)
     {
-        sprintf(buffer,"%s.chs",filename);
+        sprintf(buffer,"%schrs",filename);
         rc = savefile(buffer,(void*)CHARSET_SWAP,768);
         if(rc) { fileerrormessage(rc,0); }
     }
@@ -1759,7 +1551,7 @@ void saveproject()
     // Store alternate charset
     if(charsetchanged[1]==1)
     {
-        sprintf(buffer,"%s.cha",filename);
+        sprintf(buffer,"%schra",filename);
         rc = savefile(buffer,(void*)CHARSET_ALT,640);
         if(rc) { fileerrormessage(rc,0); }
     }  
@@ -1773,14 +1565,14 @@ void loadproject()
     unsigned char projbuffer[19];
     int escapeflag;
   
-    escapeflag = chooseidandfilename("Load project",9,7);
+    escapeflag = chooseidandfilename("Load project",10);
 
     windowrestore(0);
 
     if(escapeflag==-1) { return; }
 
     // Load project variables
-    sprintf(buffer,"%s.prj",filename);
+    sprintf(buffer,"%sproj",filename);
     rc = loadfile(buffer,(void*)projbuffer,&len);
 
     if(!len) { return; }
@@ -1804,7 +1596,7 @@ void loadproject()
     yoffset                 = projbuffer[18];
 
     // Load screen
-    sprintf(buffer,"%s.scr",filename);
+    sprintf(buffer,"%sscrn",filename);
     rc=loadfile(buffer,(void*)SCREENMAPBASE,&len);
     if(len)
     {
@@ -1818,7 +1610,7 @@ void loadproject()
     // Load standard charset
     if(charsetchanged[0]==1)
     {
-        sprintf(buffer,"%s.chs",filename);
+        sprintf(buffer,"%schrs",filename);
         rc=loadfile(filename,(void*)CHARSET_SWAP,&len);
         if(!len) { charsetchanged[0]=0; }
     }
@@ -1826,60 +1618,10 @@ void loadproject()
     // Load alternate charset
     if(charsetchanged[0]==1)
     {
-        sprintf(buffer,"%s.cha",filename);
+        sprintf(buffer,"%schra",filename);
         rc=loadfile(filename,(void*)CHARSET_ALT,&len);
         if(!len) { charsetchanged[1]=0; }
     }
-}
-
-void loadcharset(unsigned char stdoralt)
-{
-    // Function to load charset
-    // Input: stdoralt: standard charset (0) or alternate charset (1)
-
-    unsigned int charsetaddress;
-    int escapeflag;
-    int rc;
-    int len = 0;
-  
-    escapeflag = chooseidandfilename("Load character set",9,7);
-
-    windowrestore(0);
-
-    if(escapeflag==-1) { return; }
-
-    charsetaddress = (stdoralt==0)? CHARSET_SWAP : CHARSET_ALT;
-
-    sprintf(buffer,"%s.%s",filename,(stdoralt==0)? "chs" : "cha");
-    rc = loadfile(buffer,(void*)charsetaddress,&len);
-
-    if(len)
-    {
-        charsetchanged[stdoralt]=1;
-    }
-}
-
-void savecharset(unsigned char stdoralt)
-{
-    // Function to save charset
-    // Input: stdoralt: standard charset (0) or alternate charset (1)
-
-    unsigned int charsetaddress;
-    int escapeflag;
-    int rc;
-    int len = 0;
-  
-    escapeflag = chooseidandfilename("Save character set",9,3);
-
-    windowrestore(0);
-
-    if(escapeflag==-1) { return; }
-
-    charsetaddress = (stdoralt==0)? CHARSET_SWAP : CHARSET_ALT;
-
-    sprintf(buffer,"%s.%s",filename,(stdoralt==0)? "chs" : "cha");
-    rc = savefile(buffer,(void*)charsetaddress,(stdoralt==0)? 768 : 640);
-    if(rc) { fileerrormessage(rc,0); }
 }
 
 void mainmenuloop()
@@ -1906,7 +1648,7 @@ void mainmenuloop()
 
         case 13:
         case 14:
-            ORIC_ScreenmapFill(SCREENMAPBASE,screenwidth,screenheight,plotink,plotpaper,(menuchoice==13)?CH_SPACE:plotscreencode);
+            ORIC_ScreenmapFill(SCREENMAPBASE,screenwidth,screenheight,plotink,plotpaper,(menuchoice==13)?A_STD:plotscreencode);
             windowrestore(0);
             ORIC_CopyViewPort(SCREENMAPBASE,screenwidth,xoffset,yoffset,0,0,40,27);
             windowsave(0,1,0);
@@ -1930,21 +1672,13 @@ void mainmenuloop()
             loadproject();
             break;
         
-        case 31:
-            loadcharset(0);
-            break;
+        //case 31:
+        //    loadcharset();
+        //    break;
         
-        case 32:
-            loadcharset(1);
-            break;
-        
-        case 33:
-            savecharset(0);
-            break;
-
-        case 34:
-            savecharset(1);
-            break;
+        //case 32:
+        //    savecharset();
+        //    break;
 
         case 41:
             versioninfo();
@@ -2014,10 +1748,7 @@ void main()
     //rc = loadfile("ose.petv",(void*)VISUALCHAR,&len);
 
     // Clear screen map in bank 1 with spaces in text color white
-    ORIC_ScreenmapFill(SCREENMAPBASE,screenwidth,screenheight,A_FWWHITE,A_FWBLACK,CH_SPACE);
-
-    // Initialise swap charset with system charset
-    memcpy((void*)CHARSET_SWAP,(void*)CHARSET_STD,768);
+    ORIC_ScreenmapFill(SCREENMAPBASE,screenwidth,screenheight,A_FWWHITE,A_FWBLACK,A_STD);
  
     // Wait for key press to start application
     setflags(SCREEN);
@@ -2103,9 +1834,9 @@ void main()
         //    break;
 
         // Palette for character selection
-        case 'p':
-            palette();
-            break;
+        //case 'p':
+        //    palette();
+        //    break;
 
         // Grab underlying character and attributes
         case 'g':

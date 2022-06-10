@@ -38,7 +38,6 @@
 
 int savefile(const char* fname, void* buf, int len)
 {
-	len--;
     sed_fname = fname;
     sed_begin = buf;
     sed_end = (char*)sed_begin+len;
@@ -54,6 +53,64 @@ int loadfile(const char* fname, void* buf, int* len)
     sed_loadfile();
     *len = sed_size;
     return sed_err;
+}
+
+// Generic upper 16 KiB overlay memory area functions
+
+void POKEO(unsigned int address, unsigned char value)
+{
+	// Function to poke to a memory position in specified Overlay
+	// Input: address, Overlay and value to poke
+
+	ORIC_addrh = (address>>8) & 0xff;					// Obtain high byte of address
+	ORIC_addrl = address & 0xff;						// Obtain low byte of address
+	ORIC_value = value;									// Store value to POKE 
+	POKEO_core();
+}
+
+unsigned char PEEKO(unsigned int address)
+{
+	// Function to peek a memory position in specified Overlay
+	// Input: address
+	// Output: peekd value
+
+	ORIC_addrh = (address>>8) & 0xff;					// Obtain high byte of address
+	ORIC_addrl = address & 0xff;						// Obtain low byte of address
+	PEEKO_core();
+	return ORIC_value;
+}
+
+void OverlayMemCopy(unsigned int source, unsigned int dest, unsigned int length)
+{
+	// Function to copy memory to another place in memory enabling overlay memory area
+	// Input: Source address, destination address, length in bytes to copy
+
+	length--;
+
+	ORIC_addrh = (source>>8) & 0xff;					// Obtain high byte of source address
+	ORIC_addrl = source & 0xff;							// Obtain low byte of source address
+	ORIC_desth = (dest>>8) & 0xff;						// Obtain high byte of destination address
+	ORIC_destl = dest & 0xff;							// Obtain low byte of destination address
+	ORIC_tmp1 = ((length>>8) & 0xff);					// Obtain number of 256 byte pages to copy
+	ORIC_tmp2 = length & 0xff;							// Obtain length in last page to copy
+
+	OverlayMemCopy_core();
+}
+
+void OverlayMemSet(unsigned int source, unsigned char value, unsigned int length)
+{
+	// Function to set memory to given value, enabling overlay memory area
+	// Input: Source address, value to set, length in bytes
+
+	length--;
+
+	ORIC_addrh = (source>>8) & 0xff;					// Obtain high byte of source address
+	ORIC_addrl = source & 0xff;							// Obtain low byte of source address
+	ORIC_value = value;									// Obtain value to set
+	ORIC_tmp1 = ((length>>8) & 0xff);					// Obtain number of 256 byte pages to copy
+	ORIC_tmp2 = length & 0xff;							// Obtain length in last page to copy
+
+	OverlayMemSet_core();
 }
 
 // Generic screen and scroll routines

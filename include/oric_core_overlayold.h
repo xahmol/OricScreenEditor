@@ -66,8 +66,17 @@ void ORIC_Scroll_left_core();
 void ORIC_Scroll_down_core();
 void ORIC_Scroll_up_core();
 void ORIC_RestoreStandardCharset();
+void POKEO_core();
+void PEEKO_core();
+void OverlayMemCopy_core();
+void OverlayMemSet_core();
 
 // Function Prototypes
+void POKEO(unsigned int address, unsigned char value);
+unsigned char PEEKO(unsigned int address);
+void OverlayMemCopy(unsigned int source, unsigned int dest, unsigned int length);
+void OverlayMemSet(unsigned int source, unsigned char value, unsigned int length);
+
 void ORIC_HChar(unsigned char row, unsigned char col, unsigned char character, unsigned char length);
 void ORIC_VChar(unsigned char row, unsigned char col, unsigned char character, unsigned char length);
 void ORIC_FillArea(unsigned char row, unsigned char col, unsigned char character, unsigned char length, unsigned char height);
