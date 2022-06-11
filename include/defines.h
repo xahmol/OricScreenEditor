@@ -2,9 +2,9 @@
 #define __DEFINES_H_
 
 /* Memory addresses mapping */
-#define SCREENMAPBASE       0x8900      // Base address for screen map
-#define MEMORYLIMIT         0xA8FF      // Upper memory limit address for screen map
-#define WINDOWBASEADDRESS   0xA900      // Base address for windows system data, 2k reserved
+#define SCREENMAPBASE       0x9000      // Base address for screen map
+#define MEMORYLIMIT         0xA9FF      // Upper memory limit address for screen map
+#define WINDOWBASEADDRESS   0xAA00      // Base address for windows system data, 2k reserved
 #define CHARSET_SWAP        0xB100      // Base address for system character set
 #define CHARSET_STD         0xB500      // Base address for redefined charset
 #define CHARSET_ALT         0xB900      // Base address for redefined charset

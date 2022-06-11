@@ -66,6 +66,7 @@ void ORIC_Scroll_left_core();
 void ORIC_Scroll_down_core();
 void ORIC_Scroll_up_core();
 void ORIC_RestoreStandardCharset();
+void ORIC_RestoreAlternateCharset();
 
 // Function Prototypes
 void ORIC_HChar(unsigned char row, unsigned char col, unsigned char character, unsigned char length);

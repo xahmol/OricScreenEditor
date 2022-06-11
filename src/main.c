@@ -773,7 +773,7 @@ void helpscreen_load(unsigned char screennumber)
     }
 
     // Load selected help screen
-    sprintf(buffer,"ose.hsc%u",screennumber);
+    sprintf(buffer,"osehs%u.bin",screennumber);
     rc = loadfile(buffer,(void*)SCREENMEMORY,&len);
 
     if(!len)
@@ -1466,6 +1466,431 @@ void palette()
     strcpy(programmode,"Main");
 }
 
+void showchareditfield()
+{
+    // Function to draw char editor background field
+    // Input: Flag for which charset is edited, standard (0) or alternate (1)
+
+    windowsave(0,12,0);
+    ORIC_FillArea(0,30,CH_SPACE,10,12);
+    ORIC_VChar(0,27,A_STD,12);
+    ORIC_VChar(0,28,A_BGWHITE,12);
+    ORIC_VChar(0,29,A_FWBLACK,12);
+}
+
+unsigned int charaddress(unsigned char screencode, unsigned char stdoralt, unsigned char swap)
+{
+    // Function to calculate address of character to edit
+    // Input:   screencode to edit, flag for standard (0) or alternate (1) charset,
+    //          flag for swap memory (1) or normal memort for standard charset
+
+    unsigned int address;
+
+    if(swap && !stdoralt)
+    {
+        address = CHARSET_SWAP;
+    }
+    else
+    {
+        address = (stdoralt==0)? CHARSET_STD:CHARSET_ALT;
+    }
+    address += (screencode-32)*8;
+    return address;
+}
+
+void showchareditgrid(unsigned int screencode, unsigned char stdoralt)
+{
+    // Function to draw grid with present char to edit
+
+    unsigned char x,y,char_byte;
+    unsigned int address;
+
+    address = charaddress(screencode,stdoralt,0);
+
+    gotoxy(30,1);
+    cprintf("Ch %2X %s",screencode,(stdoralt==0)? "Std":"Alt");
+
+    for(y=0;y<8;y++)
+    {
+        char_byte = PEEK(address+y);
+        gotoxy(30,y+3);
+        cprintf("%2X",char_byte);
+        for(x=0;x<6;x++)
+        {
+            if(char_byte & (1<<(5-x)))
+            {
+                cputcxy(x+33,y+3,CH_INVSPACE);
+            }
+            else
+            {
+                cputcxy(x+33,y+3,CH_SPACE);
+            }
+        }
+    }
+}
+
+void chareditor()
+{
+    unsigned char x,y,char_altorstd,char_screencode,key;
+    unsigned char xpos=0;
+    unsigned char ypos=0;
+    unsigned char char_present[8];
+    unsigned char char_copy[8];
+    unsigned char char_undo[8];
+    unsigned char char_buffer[8];
+    unsigned int char_address;
+    unsigned char charchanged = 0;
+    unsigned char bitset;
+    char* ptrend;
+
+    char_altorstd = plotaltchar;
+    char_screencode = plotscreencode;
+    char_address = charaddress(char_screencode, char_altorstd,0);
+    charsetchanged[plotaltchar]=1;
+    strcpy(programmode,"Charedit");
+
+    for(y=0;y<8;y++)
+    {
+        char_present[y]=PEEK(char_address+y);
+        char_undo[y]=char_present[y];
+    }
+
+    showchareditfield();
+    showchareditgrid(char_screencode, char_altorstd);
+    do
+    {
+        bitset = (char_present[ypos] & (1<<(5-xpos)))?1:0;
+        cputcxy(xpos+33,ypos+3,'*'+bitset*128);
+        if(showbar) { printstatusbar(); }
+        key = cgetc();
+        cputcxy(xpos+33,ypos+3,CH_SPACE+bitset*128);
+
+        switch (key)
+        {
+        // Movement
+        case CH_CURS_RIGHT:
+            if(xpos<5) {xpos++; }
+            break;
+        
+        case CH_CURS_LEFT:
+            if(xpos>0) {xpos--; }
+            break;
+        
+        case CH_CURS_DOWN:
+            if(ypos<7) {ypos++; }
+            break;
+
+        case CH_CURS_UP:
+            if(ypos>0) {ypos--; }
+            break;
+
+        // Next or previous character
+        case '+':
+        case '-':
+        case '=':
+            if(key=='+' || key=='=')
+            {
+                char_screencode++;
+                if(char_screencode>127 || (char_altorstd && char_screencode>11)) { char_screencode=32; }
+            }
+            else
+            {
+                if(char_screencode>32)
+                {
+                    char_screencode--;
+                }
+                else
+                {
+                    char_screencode = (char_altorstd)?111:127;
+                }
+                
+            }
+            charchanged=1;
+            break;
+
+        // Toggle bit
+        case CH_SPACE:
+            char_present[ypos] ^= 1 << (5-xpos);
+            POKE(char_address+ypos,char_present[ypos]);
+            POKE(charaddress(char_screencode,char_altorstd,1)+ypos,char_present[ypos]);
+            showchareditgrid(char_screencode, char_altorstd);
+            break;
+
+        // Inverse
+        case 'i':
+            for(y=0;y<8;y++)
+            {
+                char_present[y] ^= 0x3F;
+                POKE(char_address+y,char_present[y]);
+                POKE(charaddress(char_screencode,char_altorstd,1)+y,char_present[y]);
+            }
+            showchareditgrid(char_screencode, char_altorstd);
+            break;
+
+        // Delete
+        case CH_DEL:
+            for(y=0;y<8;y++)
+            {
+                char_present[y] = 0;
+                POKE(char_address+y,char_present[y]);
+                POKE(charaddress(char_screencode,char_altorstd,1)+y,char_present[y]);
+            }
+            showchareditgrid(char_screencode, char_altorstd);
+            break;
+
+        // Undo
+        case 'z':
+            for(y=0;y<8;y++)
+            {
+                char_present[y] = char_undo[y];
+                POKE(char_address+y,char_present[y]);
+                POKE(charaddress(char_screencode,char_altorstd,1)+y,char_present[y]);
+            }
+            showchareditgrid(char_screencode, char_altorstd);
+            break;
+
+        // Restore from system font
+        case 's':
+            if(!char_altorstd)
+            {
+                for(y=0;y<8;y++)
+                {
+                    char_present[y] = PEEK(CHARSETROM+y+(char_screencode-32)*8);
+                    POKE(char_address+y,char_present[y]);
+                    POKE(charaddress(char_screencode,char_altorstd,1)+y,char_present[y]);
+                }
+                showchareditgrid(char_screencode, char_altorstd);
+            }
+            break;
+
+        // Copy
+        case 'c':
+            for(y=0;y<8;y++)
+            {
+                char_copy[y] = char_present[y];
+            }
+            break;
+
+        // Paste
+        case 'v':
+            for(y=0;y<8;y++)
+            {
+                char_present[y] = char_copy[y];
+                POKE(char_address+y,char_present[y]);
+                POKE(charaddress(char_screencode,char_altorstd,1)+y,char_present[y]);
+            }
+            showchareditgrid(char_screencode, char_altorstd);
+            break;
+
+        // Switch charset
+        case 'a':
+            char_altorstd = (char_altorstd==0)? 1:0;
+            if(char_altorstd && char_screencode>111) { char_screencode=32; }
+            charchanged=1;
+            break;
+
+        // Mirror y axis
+        case 'y':
+            for(y=0;y<8;y++)
+            {
+                POKE(char_address+y,char_present[7-y]);
+                POKE(charaddress(char_screencode,char_altorstd,1)+y,char_present[7-y]);
+            }
+            for(y=0;y<8;y++)
+            {
+                char_present[y]=PEEK(char_address+y);
+            }
+            showchareditgrid(char_screencode, char_altorstd);
+            break;
+
+        // Mirror x axis
+        case 'x':
+            for(y=0;y<8;y++)
+            {
+                for(x=0;x<6;x++)
+                {
+                    if(char_present[y] & (1<<(5-x)))
+                    {
+                        char_buffer[y] |= (1<<x);
+                    }
+                    else
+                    {
+                        char_buffer[y] &= ~(1<<x);
+                    }
+                }
+            }
+            for(y=0;y<8;y++)
+            {
+                char_present[y]=char_buffer[y];
+                POKE(char_address+y,char_present[y]);
+                POKE(charaddress(char_screencode,char_altorstd,1)+y,char_present[y]);
+            }
+            showchareditgrid(char_screencode, char_altorstd);
+            break;
+
+        // Scroll up
+        case 'u':
+            for(y=1;y<8;y++)
+            {
+                char_buffer[y-1]=char_present[y];
+            }
+            char_buffer[7]=char_present[0];
+            for(y=0;y<8;y++)
+            {
+                char_present[y]=char_buffer[y];
+                POKE(char_address+y,char_present[y]);
+                POKE(charaddress(char_screencode,char_altorstd,1)+y,char_present[y]);
+            }
+            showchareditgrid(char_screencode, char_altorstd);
+            break;
+
+        // Scroll down
+        case 'd':
+            for(y=1;y<8;y++)
+            {
+                char_buffer[y]=char_present[y-1];
+            }
+            char_buffer[0]=char_present[7];
+            for(y=0;y<8;y++)
+            {
+                char_present[y]=char_buffer[y];
+                POKE(char_address+y,char_present[y]);
+                POKE(charaddress(char_screencode,char_altorstd,1)+y,char_present[y]);
+            }
+            showchareditgrid(char_screencode, char_altorstd);
+            break;
+
+        // Scroll right
+        case 'r':
+            for(y=0;y<8;y++)
+            {
+                char_buffer[y]=char_present[y]>>1;
+                if(char_present[y]&0x01) { char_buffer[y]+=0x20; }
+            }
+            for(y=0;y<8;y++)
+            {
+                char_present[y]=char_buffer[y];
+                POKE(char_address+y,char_present[y]);
+                POKE(charaddress(char_screencode,char_altorstd,1)+y,char_present[y]);
+            }
+            showchareditgrid(char_screencode, char_altorstd);
+            break;
+        
+        // Scroll left
+        case 'l':
+            for(y=0;y<8;y++)
+            {
+                char_buffer[y]=char_present[y]<<1;
+                if(char_present[y]&0x20) { char_buffer[y]+=0x01; }
+                char_buffer[y] &= 0x3F;
+            }
+            for(y=0;y<8;y++)
+            {
+                char_present[y]=char_buffer[y];
+                POKE(char_address+y,char_present[y]);
+                POKE(charaddress(char_screencode,char_altorstd,1)+y,char_present[y]);
+            }
+            showchareditgrid(char_screencode, char_altorstd);
+            break;
+
+        // Hex edit
+        case 'h':
+            sprintf(buffer,"%2x",char_present[ypos]);
+            textInput(30,ypos+3,buffer,2,3);
+            char_present[ypos] = (unsigned char)strtol(buffer,&ptrend,16);
+            POKE(char_address+ypos,char_present[ypos]);
+            POKE(charaddress(char_screencode,char_altorstd,1)+ypos,char_present[ypos]);
+            showchareditgrid(char_screencode, char_altorstd);
+            break;
+
+        // Toggle statusbar
+        case CH_F6:
+            togglestatusbar();
+            break;
+
+        // Help screen
+        case CH_F8:
+            windowrestore(0);
+            helpscreen_load(2);
+            if(charsetchanged[0] ==1)
+            {
+                charset_swap(1);
+            }
+            showchareditfield();
+            showchareditgrid(char_screencode,char_altorstd);
+            break;
+
+        // Store to favourites with SHIFT+0-9
+        case 33:
+            favourites[1] = char_screencode;
+            break;
+
+        case 64:
+            favourites[2] = char_screencode;
+            break;
+
+        case 35:
+            favourites[3] = char_screencode;
+            break;
+
+        case 36:
+            favourites[4] = char_screencode;
+            break;
+
+        case 37:
+            favourites[5] = char_screencode;
+            break;
+
+        case 94:
+            favourites[6] = char_screencode;
+            break;
+
+        case 38:
+            favourites[7] = char_screencode;
+            break;
+
+        case 42:
+            favourites[8] = char_screencode;
+            break;
+
+        case 40:
+            favourites[9] = char_screencode;
+            break;
+
+        case 41:
+            favourites[0] = char_screencode;
+            break;
+
+        default:
+            // 0-9: Favourites select
+            if(key>47 && key<58)
+            {
+                char_screencode = favourites[key-48];
+                charchanged=1;
+            }
+            break;
+        }
+
+        if(charchanged)
+        {
+            charchanged=0;
+            char_address = charaddress(char_screencode,char_altorstd,0);
+            for(y=0;y<8;y++)
+            {
+                char_present[y]=PEEK(char_address+y);
+                char_undo[y]=char_present[y];
+            }
+            showchareditgrid(char_screencode, char_altorstd);
+        }
+    } while (key != CH_ESC && key != CH_STOP);
+
+    windowrestore(0);
+
+    plotscreencode = char_screencode;
+    plotaltchar = char_altorstd;
+    cputcxy(screen_col,screen_row,plotscreencode+128);
+    strcpy(programmode,"Main");
+}
 
 void resizewidth()
 {
@@ -1819,7 +2244,7 @@ void loadproject()
     if(charsetchanged[0]==1)
     {
         sprintf(buffer,"%s.chs",filename);
-        rc=loadfile(filename,(void*)CHARSET_SWAP,&len);
+        rc=loadfile(buffer,(void*)CHARSET_SWAP,&len);
         if(!len) { charsetchanged[0]=0; }
     }
 
@@ -1827,7 +2252,7 @@ void loadproject()
     if(charsetchanged[0]==1)
     {
         sprintf(buffer,"%s.cha",filename);
-        rc=loadfile(filename,(void*)CHARSET_ALT,&len);
+        rc=loadfile(buffer,(void*)CHARSET_ALT,&len);
         if(!len) { charsetchanged[1]=0; }
     }
 }
@@ -1999,8 +2424,10 @@ void main()
             VERSION_MAJOR, VERSION_MINOR,
             BUILD_YEAR_CH0, BUILD_YEAR_CH1, BUILD_YEAR_CH2, BUILD_YEAR_CH3, BUILD_MONTH_CH0, BUILD_MONTH_CH1, BUILD_DAY_CH0, BUILD_DAY_CH1,BUILD_HOUR_CH0, BUILD_HOUR_CH1, BUILD_MIN_CH0, BUILD_MIN_CH1);
 
-    // Initialise VDC screen and VDC assembly routines
+    // Initialise screen and set standard charsets
     ORIC_Init();
+    ORIC_RestoreStandardCharset();
+    ORIC_RestoreAlternateCharset();
 
     // Load and show title screen
     //printcentered("Load title screen",10,26,20);
@@ -2097,10 +2524,10 @@ void main()
             plotdouble = (plotdouble==0)? 1:0;
             break;
 
-        // Character eddit mode
-        //case 'e':
-        //    chareditor();
-        //    break;
+        // Character edit mode
+        case 'e':
+            chareditor();
+            break;
 
         // Palette for character selection
         case 'p':

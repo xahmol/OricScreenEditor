@@ -55,6 +55,7 @@
 	.export		_ORIC_Scroll_down_core
 	.export		_ORIC_Scroll_up_core
     .export     _ORIC_RestoreStandardCharset
+    .export     _ORIC_RestoreAlternateCharset
     .export		_POKEO_core
 	.export		_PEEKO_core
 	.export		_OverlayMemCopy_core
@@ -857,3 +858,15 @@ _ORIC_RestoreStandardCharset:
     ldx #$05                            ; Set up right value for lookup table
     jsr $F982                           ; Jump to ROM copy routine
     rts
+
+; ------------------------------------------------------------------------------------------
+_ORIC_RestoreAlternateCharset:
+; Function to restore ORIC alternate charset
+; Call to ORIC Atmos rom Generate alt. char set routine at $F816
+; Reference: Oric Advanced User Guide - Leycester Whewell
+; https://library.defence-force.org/books/content/oric_advanced_user_guide.pdf
+; ------------------------------------------------------------------------------------------
+
+    jsr $F816                           ; Jump to ROM routine
+    rts
+
