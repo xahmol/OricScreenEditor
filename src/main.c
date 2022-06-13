@@ -2052,7 +2052,7 @@ int chooseidandfilename(char* headertext, unsigned char maxlen, unsigned char va
     // Function to present dialogue to enter device id and filename
     // Input: Headertext to print, maximum length of filename input string
 
-    unsigned char valid = 0;
+    int valid = 0;
 
     windownew(2,5,12,38,0);
     cputsxy(4,6,headertext);
@@ -2098,7 +2098,7 @@ void loadscreenmap(unsigned char combined)
     {
         windowrestore(0);
         windowrestore(0);
-        sprintf(buffer,"%s.bin",filename);
+        sprintf(buffer,"%s.*",filename);
         rc=loadfile(buffer,(void*)address,&len);
 
         if(len)
@@ -2234,7 +2234,7 @@ void loadproject()
     if(escapeflag==-1) { return; }
 
     // Load project variables
-    sprintf(buffer,"%s.prj",filename);
+    sprintf(buffer,"%spj.bin",filename);
     rc = loadfile(buffer,(void*)projbuffer,&len);
 
     if(!len) { return; }
@@ -2278,7 +2278,7 @@ void loadproject()
     }
 
     // Load alternate charset
-    if(charsetchanged[0]==1)
+    if(charsetchanged[1]==1)
     {
         sprintf(buffer,"%sca.bin",filename);
         rc=loadfile(buffer,(void*)CHARSET_ALT,&len);
@@ -2306,7 +2306,7 @@ void loadcharset(unsigned char stdoralt)
     if(stdoralt==1) { charsetaddress = CHARSET_ALT; }
     if(stdoralt==2) { charsetaddress = CHARSET_STD; }
 
-    sprintf(buffer,"%s.bin",filename);
+    sprintf(buffer,"%s.*",filename);
     rc = loadfile(buffer,(void*)charsetaddress,&len);
 
     if(len)

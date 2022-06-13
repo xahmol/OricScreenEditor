@@ -1,7 +1,9 @@
+make.exe --dry-run --always-make --keep-going --print-directory
 make: Entering directory 'd:/Git/OricScreenEditor'
  
 process_begin: CreateProcess(NULL, dirname d:/Git/OricScreenEditor/Makefile, ...) failed.
 Makefile:25: pipe: No error
+
 process_begin: CreateProcess(NULL, pwd, ...) failed.
 Makefile:29: pipe: No error
 
