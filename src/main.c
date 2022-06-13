@@ -64,8 +64,8 @@ unsigned char menubaroptions = 4;
 unsigned char pulldownmenunumber = 8;
 char menubartitles[4][12] = {"Screen","File","Charset","Information"};
 unsigned char menubarcoords[4] = {2,9,14,22};
-unsigned char pulldownmenuoptions[5] = {4,4,4,2,2};
-char pulldownmenutitles[5][4][16] = {
+unsigned char pulldownmenuoptions[5] = {4,6,6,2,2};
+char pulldownmenutitles[5][6][16] = {
     {"Width:      40 ",
      "Height:     27 ",
      "Clear          ",
@@ -73,11 +73,15 @@ char pulldownmenutitles[5][4][16] = {
     {"Save screen    ",
      "Load screen    ",
      "Save project   ",
-     "Load project   "},
+     "Load project   ",
+     "Save combined  ",
+     "Load combined  "},
     {"Load standard  ",
      "Load alternate ",
      "Save standard  ",
-     "Save alternate "},
+     "Save alternate ",
+     "Load combined  ",
+     "Save combined  "},
     {"Version/credits",
      "Exit program   "},
     {"Yes",\
@@ -87,7 +91,7 @@ char pulldownmenutitles[5][4][16] = {
 // Global variables
 unsigned char charsetchanged[2];
 unsigned char appexit;
-char filename[10];
+char filename[8];
 char programmode[11];
 unsigned char showbar;
 
@@ -147,7 +151,7 @@ void printcentered(char* text, unsigned char xpos, unsigned char ypos, unsigned 
     gotoxy(xpos,ypos);
     if(strlen(text)<width)
     {
-        cspaces((width-strlen(text))/2-1);
+        cspaces((width-strlen(text))/2);
     }
     cputs(text);
 }
@@ -1543,7 +1547,7 @@ void chareditor()
     unsigned char bitset;
     char* ptrend;
 
-    char_altorstd = plotaltchar;
+    char_altorstd = 0;
     char_screencode = plotscreencode;
     char_address = charaddress(char_screencode, char_altorstd,0);
     charsetchanged[plotaltchar]=1;
@@ -2058,7 +2062,7 @@ int chooseidandfilename(char* headertext, unsigned char maxlen, unsigned char va
     return valid;
 }
 
-void loadscreenmap()
+void loadscreenmap(unsigned char combined)
 {
     // Function to load screenmap
 
@@ -2068,6 +2072,7 @@ void loadscreenmap()
     int escapeflag;
     int rc;
     int len = 0;
+    int address = (combined)?CHARSET_STD:SCREENMAPBASE;
   
     escapeflag = chooseidandfilename("Load screen",9,7);
 
@@ -2092,38 +2097,62 @@ void loadscreenmap()
     else
     {
         windowrestore(0);
-
-        sprintf(buffer,"%s.scr",filename);
-        rc=loadfile(buffer,(void*)SCREENMAPBASE,&len);
+        windowrestore(0);
+        sprintf(buffer,"%s.bin",filename);
+        rc=loadfile(buffer,(void*)address,&len);
 
         if(len)
         {
-            windowrestore(0);
             screenwidth = newwidth;
             screenheight = newheight;
-            ORIC_CopyViewPort(SCREENMAPBASE,screenwidth,xoffset,yoffset,0,0,40,27);
-            windowsave(0,1,0);
-            menuplacebar();
-            if(showbar) { initstatusbar(); }
+            if(combined)
+            {
+                memcpy((void*)SCREENMAPBASE,(void*)SCREENMEMORY,1080);
+                memcpy((void*)CHARSET_SWAP,(void*)CHARSET_STD,768);
+                charsetchanged[0]=1;
+                charsetchanged[1]=1;
+                charset_swap(0);                
+            }
         }
+        ORIC_CopyViewPort(SCREENMAPBASE,screenwidth,xoffset,yoffset,0,0,40,27);
+        windowsave(0,1,0);
+        menuplacebar();
+        if(showbar) { initstatusbar(); }
     }
 }
 
-void savescreenmap()
+void savescreenmap(unsigned char combined)
 {
     // Function to save screenmap
     int escapeflag;
     int rc;
-    int len = 0;
-  
+    int len = screenwidth*screenheight;
+    int address = (combined)?CHARSET_STD:SCREENMAPBASE;
+
     escapeflag = chooseidandfilename("Save screen",9,3);
 
     windowrestore(0);
 
     if(escapeflag==-1) { return; }
 
-    sprintf(buffer,"%s.scr",filename);
-    rc = savefile(buffer,(void*)SCREENMAPBASE,screenwidth*screenheight);
+    if(combined)
+    {
+        windowrestore(0);
+        ORIC_CopyViewPort(SCREENMAPBASE,screenwidth,xoffset,yoffset,0,0,40,27);
+        charset_swap(1);
+        len+=1664;
+    }
+
+    sprintf(buffer,"%s.bin",filename);
+    rc = savefile(buffer,(void*)address,len);
+
+    if(combined)
+    {
+        charset_swap(0);
+        windowsave(0,1,0);
+        menuplacebar();
+        if(showbar) { initstatusbar(); }
+    }
     
     if(rc) { fileerrormessage(rc,0); }
 }
@@ -2136,7 +2165,7 @@ void saveproject()
     char projbuffer[19];
     int escapeflag;
   
-    escapeflag = chooseidandfilename("Save project",9,3);
+    escapeflag = chooseidandfilename("Save project",7,3);
 
     windowrestore(0);
 
@@ -2162,21 +2191,21 @@ void saveproject()
     projbuffer[17] = xoffset;
     projbuffer[18] = yoffset;
 
-    sprintf(buffer,"%s.prj",filename);
+    sprintf(buffer,"%spj.bin",filename);
 
     rc = savefile(buffer,(void*)projbuffer,19);
 
     if(rc) { fileerrormessage(rc,0); }
 
     // Store screen data
-    sprintf(buffer,"%s.scr",filename);
+    sprintf(buffer,"%ssc.bin",filename);
     rc = savefile(buffer,(void*)SCREENMAPBASE,screenwidth*screenheight);
     if(rc) { fileerrormessage(rc,0); }
 
     // Store standard charset
     if(charsetchanged[0]==1)
     {
-        sprintf(buffer,"%s.chs",filename);
+        sprintf(buffer,"%scs.bin",filename);
         rc = savefile(buffer,(void*)CHARSET_SWAP,768);
         if(rc) { fileerrormessage(rc,0); }
     }
@@ -2184,7 +2213,7 @@ void saveproject()
     // Store alternate charset
     if(charsetchanged[1]==1)
     {
-        sprintf(buffer,"%s.cha",filename);
+        sprintf(buffer,"%sca.bin",filename);
         rc = savefile(buffer,(void*)CHARSET_ALT,640);
         if(rc) { fileerrormessage(rc,0); }
     }  
@@ -2198,7 +2227,7 @@ void loadproject()
     unsigned char projbuffer[19];
     int escapeflag;
   
-    escapeflag = chooseidandfilename("Load project",9,7);
+    escapeflag = chooseidandfilename("Load project",7,7);
 
     windowrestore(0);
 
@@ -2229,7 +2258,7 @@ void loadproject()
     yoffset                 = projbuffer[18];
 
     // Load screen
-    sprintf(buffer,"%s.scr",filename);
+    sprintf(buffer,"%ssc.bin",filename);
     rc=loadfile(buffer,(void*)SCREENMAPBASE,&len);
     if(len)
     {
@@ -2243,7 +2272,7 @@ void loadproject()
     // Load standard charset
     if(charsetchanged[0]==1)
     {
-        sprintf(buffer,"%s.chs",filename);
+        sprintf(buffer,"%scs.bin",filename);
         rc=loadfile(buffer,(void*)CHARSET_SWAP,&len);
         if(!len) { charsetchanged[0]=0; }
     }
@@ -2251,7 +2280,7 @@ void loadproject()
     // Load alternate charset
     if(charsetchanged[0]==1)
     {
-        sprintf(buffer,"%s.cha",filename);
+        sprintf(buffer,"%sca.bin",filename);
         rc=loadfile(buffer,(void*)CHARSET_ALT,&len);
         if(!len) { charsetchanged[1]=0; }
     }
@@ -2260,7 +2289,7 @@ void loadproject()
 void loadcharset(unsigned char stdoralt)
 {
     // Function to load charset
-    // Input: stdoralt: standard charset (0) or alternate charset (1)
+    // Input: stdoralt: standard charset (0), alternate charset (1) or combined (2)
 
     unsigned int charsetaddress;
     int escapeflag;
@@ -2273,26 +2302,38 @@ void loadcharset(unsigned char stdoralt)
 
     if(escapeflag==-1) { return; }
 
-    charsetaddress = (stdoralt==0)? CHARSET_SWAP : CHARSET_ALT;
+    if(stdoralt==0) { charsetaddress = CHARSET_SWAP; }
+    if(stdoralt==1) { charsetaddress = CHARSET_ALT; }
+    if(stdoralt==2) { charsetaddress = CHARSET_STD; }
 
-    sprintf(buffer,"%s.%s",filename,(stdoralt==0)? "chs" : "cha");
+    sprintf(buffer,"%s.bin",filename);
     rc = loadfile(buffer,(void*)charsetaddress,&len);
 
     if(len)
     {
-        charsetchanged[stdoralt]=1;
+        if(stdoralt<2)
+        {
+            charsetchanged[stdoralt]=1;
+        }
+        else
+        {
+            charsetchanged[0]=1;
+            charsetchanged[1]=1;
+            memcpy((void*)CHARSET_SWAP,(void*)CHARSET_STD,768);
+            charset_swap(0);
+        }
     }
 }
 
 void savecharset(unsigned char stdoralt)
 {
     // Function to save charset
-    // Input: stdoralt: standard charset (0) or alternate charset (1)
+    // Input: stdoralt: standard charset (0), alternate charset (1) or combined (2)
 
     unsigned int charsetaddress;
     int escapeflag;
     int rc;
-    int len = 0;
+    int len;
   
     escapeflag = chooseidandfilename("Save character set",9,3);
 
@@ -2300,11 +2341,14 @@ void savecharset(unsigned char stdoralt)
 
     if(escapeflag==-1) { return; }
 
-    charsetaddress = (stdoralt==0)? CHARSET_SWAP : CHARSET_ALT;
+    if(stdoralt==0) { charsetaddress = CHARSET_SWAP; len=768;}
+    if(stdoralt==1) { charsetaddress = CHARSET_ALT; len=640;}
+    if(stdoralt==2) { charsetaddress = CHARSET_STD; charset_swap(1); len=1664;}
 
-    sprintf(buffer,"%s.%s",filename,(stdoralt==0)? "chs" : "cha");
-    rc = savefile(buffer,(void*)charsetaddress,(stdoralt==0)? 768 : 640);
+    sprintf(buffer,"%s.bin",filename);
+    rc = savefile(buffer,(void*)charsetaddress,len);
     if(rc) { fileerrormessage(rc,0); }
+    if(stdoralt==2) { charset_swap(0);}
 }
 
 void mainmenuloop()
@@ -2340,11 +2384,11 @@ void mainmenuloop()
             break;
 
         case 21:
-            savescreenmap();
+            savescreenmap(0);
             break;
 
         case 22:
-            loadscreenmap();
+            loadscreenmap(0);
             break;
         
         case 23:
@@ -2353,6 +2397,14 @@ void mainmenuloop()
         
         case 24:
             loadproject();
+            break;
+
+        case 25:
+            savescreenmap(1);
+            break;
+
+        case 26:
+            loadscreenmap(1);
             break;
         
         case 31:
@@ -2369,6 +2421,14 @@ void mainmenuloop()
 
         case 34:
             savecharset(1);
+            break;
+        
+        case 35:
+            loadcharset(2);
+            break;
+        
+        case 36:
+            savecharset(2);
             break;
 
         case 41:
@@ -2393,7 +2453,7 @@ void main()
 {
     // Main application initialization, loop and exit
     
-    unsigned char key;
+    unsigned char key,grab;
     int rc;
     int len = 0;
 
@@ -2430,15 +2490,7 @@ void main()
     ORIC_RestoreAlternateCharset();
 
     // Load and show title screen
-    //printcentered("Load title screen",10,26,20);
-    //rc = loadfile("ose.tscr",(void*)SCREENMEMORY,&len);
-
-    // Init overlays
-    //initoverlay();
-
-    // Load visual PETSCII map mapping data
-    //printcentered("Load palette map",10,26,20);
-    //rc = loadfile("ose.petv",(void*)VISUALCHAR,&len);
+    rc = loadfile("osetsc.bin",(void*)SCREENMEMORY,&len);
 
     // Clear screen map in bank 1 with spaces in text color white
     ORIC_ScreenmapFill(SCREENMAPBASE,screenwidth,screenheight,A_FWWHITE,A_FWBLACK,CH_SPACE);
@@ -2536,8 +2588,24 @@ void main()
 
         // Grab underlying character and attributes
         case 'g':
-            plotscreencode = PEEK(screenmap_screenaddr(screen_row+yoffset,screen_col+xoffset,screenwidth));
-            cputcxy(screen_col,screen_row,plotscreencode+128);
+            grab = PEEK(screenmap_screenaddr(screen_row+yoffset,screen_col+xoffset,screenwidth));
+            if(grab>31)
+            {
+                plotscreencode = grab;
+                cputcxy(screen_col,screen_row,plotscreencode+128);
+            }
+            else
+            {
+                if(grab<8) { plotink=grab; }
+                if(grab>15) { plotpaper=grab; }
+                if(grab>7 && grab <16)
+                {
+                    grab -= 8;
+                    plotaltchar = grab & 1;
+                    plotdouble = grab & 2;
+                    plotblink = grab & 4;
+                }
+            }
             break;
 
         // Write mode: type in screencodes

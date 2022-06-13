@@ -1,0 +1,1 @@
+{"buildTargets":[".PHONY",".SUFFIXES","BUILD/OSE.bin","BUILD/OSE.dsk","all","clean","run","run-debug","src/main.o"],"launchTargets":[],"customConfigurationProvider":{"workspaceBrowse":{"browsePath":[],"compilerArgs":[]},"fileIndex":[]}}

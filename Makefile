@@ -86,7 +86,7 @@ $(PROGRAM): $(SOURCES:.c=.o)
 # Build disk
 $(DISK_DSK): $(PROGRAM) $(TESTPROG_BIN)
 	$(OSDK)header $(PROGRAM) BUILD/$(PROJECT).tap 0x0501
-	$(OSDK)tap2dsk -iCLS:$(PROJECT) -c20:3 -n$(PROJECT) BUILD/$(PROJECT).tap OSEHS1.tap OSEHS2.tap OSEHS3.tap OSEHS4.tap $(DISK_DSK)
+	$(OSDK)tap2dsk -iCLS:$(PROJECT) -c20:3 -n$(PROJECT) BUILD/$(PROJECT).tap OSEHS1.tap OSEHS2.tap OSEHS3.tap OSEHS4.tap OSETSC.tap $(DISK_DSK)
 	$(OSDK)old2mfm $(DISK_DSK)
 	cd $(HXCFE); ./hxcfe -finput:"$(mkfile_path)/$(DISK_DSK)" -foutput:"$(mkfile_path)/$(DISK_HFE)" -conv:HXC_HFE
 

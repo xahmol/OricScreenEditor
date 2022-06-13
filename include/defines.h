@@ -38,12 +38,12 @@ extern unsigned char pulldownmenunumber;
 extern char menubartitles[4][12];
 extern unsigned char menubarcoords[4];
 extern unsigned char pulldownmenuoptions[5];
-extern char pulldownmenutitles[5][4][16];
+extern char pulldownmenutitles[5][6][16];
 
 // Global variables
 extern unsigned char charsetchanged[2];
 extern unsigned char appexit;
-extern char filename[10];
+extern char filename[8];
 extern char programmode[11];
 extern unsigned char showbar;
 extern unsigned char screen_col;
