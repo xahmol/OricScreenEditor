@@ -11,7 +11,7 @@ Makefile:29: pipe: No error
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Mon Jun 13 16:15:28 2022
+# Make data base, printed on Mon Jun 13 16:40:06 2022
 
 # Variables
 
@@ -26,7 +26,7 @@ USERPROFILE = C:\Users\xande
 # environment
 LOCALAPPDATA = C:\Users\xande\AppData\Local
 # environment
-VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-a6538495-df1c-40f2-94af-a7c8796d53f2-sock
+VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-d20ffb3c-25c0-4d5b-955b-f77963332391-sock
 # environment
 VSCODE_CWD = C:\Program Files\Microsoft VS Code
 # environment
@@ -46,7 +46,7 @@ HXCFE := /home/xahmol/hxcfloppyemu-cod/HxCFloppyEmulator/HxCFloppyEmulator_cmdli
 # environment
 DOKANLIBRARY1_LIBRARYPATH_X64 = C:\Program Files\Dokan\Dokan Library-1.4.1\lib\
 # environment
-CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_18772_GADRHNJCNYPZPHEE
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_28796_ECXPIEISAXLNQIAF
 # environment
 VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # default
@@ -114,7 +114,7 @@ MAKEFILE_LIST := Makefile src/main.d src/oric_core.d
 # environment
 VSCODE_VERBOSE_LOGGING = true
 # environment
-VSCODE_PID = 18772
+VSCODE_PID = 28796
 # automatic
 ?D = $(patsubst %/,%,$(patsubst %\,%,$(dir $?)))
 # environment
@@ -262,7 +262,7 @@ SOURCES = src/main.c src/oric_core.c
 # environment
 PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 165 Stepping 5, GenuineIntel
 # variable set hash-table stats:
-# Load=123/1024=12%, Rehash=0, Collisions=13/194=7%
+# Load=123/1024=12%, Rehash=0, Collisions=13/200=6%
 
 # Pattern-specific Variable Values
 
@@ -271,9 +271,9 @@ PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 165 Stepping 5, GenuineIntel
 # Directories
 
 # src (key d:/Git/OricScreenEditor/src, mtime 1655126897): No files, no impossibilities so far.
-# . (key d:/Git/OricScreenEditor, mtime 1655066648): 23 files, no impossibilities.
+# . (key d:/Git/OricScreenEditor, mtime 1655130974): 24 files, no impossibilities.
 
-# 23 files, no impossibilities in 2 directories.
+# 24 files, no impossibilities in 2 directories.
 
 # Implicit Rules
 
@@ -288,7 +288,9 @@ BUILD/OSE.bin: src/main.o src/oric_core.o
 #  Implicit rule search has not been done.
 #  Last modified 2022-06-13 15:28:17
 #  File has been updated.
-#  Successfully updated.
+#  Needs to be updated (-q is set).
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/6=0%
 #  recipe to execute (from 'Makefile', line 84):
 	$(CC) $(LDFLAGS) -o $@ $^ $(LIBOBJECTS)
 
@@ -300,10 +302,9 @@ Makefile:
 #  Successfully updated.
 
 src/oric_core.c:
-#  Implicit rule search has been done.
-#  Last modified 2022-06-10 17:37:51
-#  File has been updated.
-#  Successfully updated.
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
 
 clean:
 #  Phony target (prerequisite of .PHONY).
@@ -320,18 +321,14 @@ include/osdklib.h:
 #  File has been updated.
 #  Successfully updated.
 
-src/oric_core.o: src/oric_core.c src/oric_core.c include/defines.h include/osdklib.h include/oric_core.h
-#  Implicit rule search has been done.
-#  Implicit/static pattern stem: 'src/oric_core'
-#  Last modified 2022-06-13 15:28:17
-#  File has been updated.
-#  Successfully updated.
-#  recipe to execute (from 'Makefile', line 80):
-	$(CC) -c $(CFLAGS) -o $@ $<
+src/oric_core.o: src/oric_core.c include/defines.h include/osdklib.h include/oric_core.h
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
 
 src/main.c:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-13 15:28:02
+#  Last modified 2022-06-13 16:17:18
 #  File has been updated.
 #  Successfully updated.
 
@@ -340,7 +337,25 @@ src/main.o: src/main.c src/main.c include/defines.h include/osdklib.h include/or
 #  Implicit/static pattern stem: 'src/main'
 #  Last modified 2022-06-13 15:28:17
 #  File has been updated.
-#  Successfully updated.
+#  Needs to be updated (-q is set).
+# automatic
+# @ := src/main.o
+# automatic
+# * := src/main
+# automatic
+# < := src/main.c
+# automatic
+# + := src/main.c src/main.c include/defines.h include/osdklib.h include/oric_core.h
+# automatic
+# % := 
+# automatic
+# ^ := src/main.c include/defines.h include/osdklib.h include/oric_core.h
+# automatic
+# ? := src/main.c
+# automatic
+# | := 
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=2/17=12%
 #  recipe to execute (from 'Makefile', line 80):
 	$(CC) -c $(CFLAGS) -o $@ $<
 
@@ -356,7 +371,9 @@ all: BUILD/OSE.bin BUILD/OSE.dsk
 #  Implicit rule search has not been done.
 #  File does not exist.
 #  File has been updated.
-#  Successfully updated.
+#  Needs to be updated (-q is set).
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/6=0%
 
 run: BUILD/OSE.dsk
 #  Phony target (prerequisite of .PHONY).
@@ -377,9 +394,8 @@ run-debug: BUILD/OSE.dsk
 
 BUILD/OSE.dsk: BUILD/OSE.bin
 #  Implicit rule search has not been done.
-#  Last modified 2022-06-13 15:31:52
-#  File has been updated.
-#  Successfully updated.
+#  Modification time never checked.
+#  File has not been updated.
 #  recipe to execute (from 'Makefile', line 88):
 	$(OSDK)header $(PROGRAM) BUILD/$(PROJECT).tap 0x0501
 	$(OSDK)tap2dsk -iCLS:$(PROJECT) -c20:3 -n$(PROJECT) BUILD/$(PROJECT).tap OSEHS1.tap OSEHS2.tap OSEHS3.tap OSEHS4.tap OSETSC.tap $(DISK_DSK)
@@ -423,19 +439,19 @@ src/oric_core.d:
 #  Successfully updated.
 
 # files hash-table stats:
-# Load=19/1024=2%, Rehash=0, Collisions=0/69=0%
+# Load=19/1024=2%, Rehash=0, Collisions=0/67=0%
 # VPATH Search Paths
 
 # No 'vpath' search paths.
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 45 / storage = 488 B / avg = 10 B
-# current buf: size = 8174 B / used = 488 B / count = 45 / avg = 10 B
+# strcache buffers: 1 (0) / strings = 45 / storage = 485 B / avg = 10 B
+# current buf: size = 8174 B / used = 485 B / count = 45 / avg = 10 B
 
-# strcache performance: lookups = 98 / hit rate = 54%
+# strcache performance: lookups = 96 / hit rate = 53%
 # hash-table stats:
-# Load=45/8192=1%, Rehash=0, Collisions=0/98=0%
-# Finished Make data base on Mon Jun 13 16:15:28 2022
+# Load=45/8192=1%, Rehash=0, Collisions=0/96=0%
+# Finished Make data base on Mon Jun 13 16:40:06 2022
 
  
