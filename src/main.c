@@ -21,13 +21,17 @@ Code and resources from others used:
     Used version adapted by Dirk Jagdmann (doj)
     https://github.com/doj/dracopy
 
--   Bart van Leeuwen: For inspiration and advice while coding.
+-   lib-sedoric from oricOpenLibrary (for SEDORIC file operations
+    By Raxiss, (c) 2021
+    https://github.com/iss000/oricOpenLibrary/blob/main/lib-sedoric/libsedoric.s
+
+-   Bart van Leeuwen and forum.defence-force.org: For inspiration and advice while coding.
 
 -   jab / Artline Designs (Jaakko Luoto) for inspiration for Palette mode and PETSCII visual mode
 
 -   Original windowing system code on Commodore 128 by unknown author.
    
--   Tested using real hardware plus Oricutron.
+-   Tested using real hardware Oric Atmos plus Cumana Reborn, and Oricutron for Windows and Linux
 
 The code can be used freely as long as you retain
 a notice describing original source and author.

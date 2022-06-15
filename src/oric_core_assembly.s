@@ -17,11 +17,6 @@
 ;   ) See https://github.com/iss000/oricOpenLibrary/blob/main/LICENSE
 ;   )
 ;
-; Overlay memory RAM area routines:
-;-  Code from Pinforic, 
-;   https://es.osdn.net/projects/oricsdk/scm/svn/blobs/head/public/oric/games/z-machine/pinforic/lib16/header.s   
-;
-;
 ; - 6502.org: Practical Memory Move Routines
 ;   http://6502.org/source/general/memory_move.html
 ;

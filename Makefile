@@ -31,9 +31,6 @@ PROGRAM      := BUILD/$(PROJECT).bin
 DISK_DSK     := BUILD/$(PROJECT).dsk
 DISK_HFE     := BUILD/$(PROJECT).hfe
 
-## Tooling arguments variables
-# Arguments for YM to MYM music conversion tool
-YM2MYM = $(OSDK)Ym2Mym -h1 -m8192
 # Arguments for emulator
 # # # Use MACH to override the default and run as:
 # # # make run-tap MACH=-ma for Atmos (default)
@@ -49,11 +46,6 @@ EMUARG                  := $(MACH)
 EMUARG                  += --serial none
 EMUARG                  += --vsynchack off
 EMUARG                  += --turbotape on
-# append symbols and breakpoints
-# read more at DF-forum:
-# https://forum.defence-force.org/viewtopic.php?p=15145#p15145
-EMUARG_DEBUG            := $(EMUARG) -s "$(PROJECT_DIR)/$(PROJECT).sym"
-EMUARG_DEBUG            +=  -r :"$(PROJECT_DIR)/$(PROJECT).brk"
 
 ## C Sources and library objects to use
 SOURCES = src/main.c src/oric_core.c
@@ -95,10 +87,6 @@ clean:
 	$(RM) $(SOURCES:.c=.o) $(SOURCES:.c=.d) $(PROGRAM) $(PROGRAM).map $(PROGRAM).brk $(PROGRAM).sym
 	cd BUILD; $(RM) *.*
 
-# Execute in emulator in debug mode: use make run-debug
-run-debug: $(DISK_DSK)
-	@([ -e $(PROJECT).brk ] || touch $(PROJECT).brk) || echo -n
-	cd $(EMUDIR); $(EMU) $(EMUARG_DEBUG) "$(PROJECT_DIR)/$(DISK_DSK)"
-
+# Execute in emulator: use make run
 run: $(DISK_DSK)
 	cd $(EMUDIR); $(EMU) $(EMUARG) "$(PROJECT_DIR)/$(DISK_DSK)"

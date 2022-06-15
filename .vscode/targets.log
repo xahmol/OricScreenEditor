@@ -1,6 +1,7 @@
 make.exe all --print-data-base --no-builtin-variables --no-builtin-rules --question
 process_begin: CreateProcess(NULL, dirname d:/Git/OricScreenEditor/Makefile, ...) failed.
 Makefile:25: pipe: No error
+
 process_begin: CreateProcess(NULL, pwd, ...) failed.
 Makefile:29: pipe: No error
 
@@ -10,8 +11,9 @@ Makefile:29: pipe: No error
 # License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
+ 
 
-# Make data base, printed on Wed Jun 15 10:28:53 2022
+# Make data base, printed on Wed Jun 15 14:50:01 2022
 
 # Variables
 
@@ -53,7 +55,7 @@ VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 .VARIABLES := 
 # automatic
 %D = $(patsubst %/,%,$(patsubst %\,%,$(dir $%)))
-# makefile (from 'Makefile', line 45)
+# makefile (from 'Makefile', line 42)
 EMU := ./oricutron
 # makefile (from 'Makefile', line 17)
 OSDK := /home/xahmol/OSDK-build/pc/tools/osdk/main/osdk-linux/bin/
@@ -65,7 +67,7 @@ VSCODE_LOG_STACK = false
 %F = $(notdir $%)
 # environment
 VSCODE_CODE_CACHE_PATH = C:\Users\xande\AppData\Roaming\Code\CachedData\4af164ea3a06f701fe3e89a2bcbb421d2026b68f
-# makefile (from 'Makefile', line 51)
+# makefile (from 'Makefile', line 48)
 EMUARG := -ma --serial none --vsynchack off --turbotape on
 # environment
 LANG = C
@@ -152,7 +154,8 @@ MAKELEVEL := 0
 # default
 MAKE = $(MAKE_COMMAND)
 # environment
-PATH = C:\Program Files\Common Files\Oracle\Java\javapath;C:\Python310\Scripts\;C:\Python310\;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Python39\Scripts\;C:\Python39\;C:\windows\system32;C:\windows;C:\windows\System32\Wbem;C:\windows\System32\WindowsPowerShell\v1.0\;C:\windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files\Calibre2\;C:\Program Files\Microsoft VS Code\bin;C:\ProgramData\chocolatey\bin;C:\Program Files\PuTTY\;C:\Program Files\LLVM\bin;C:\Program Files\Amazon\AWSCLIV2\;C:\Program Files (x86)\HP\IdrsOCR_15.2.10.1114\;C:\Program Files\dotnet\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files (x86)\dotnet\;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin;C:\Program Files\nodejs\;C:\Users\xande\AppData\Local\Microsoft\WindowsApps;C:\Users\xande\AppData\Local\GitHubDesktop\bin;C:\Users\xande\AppData\Local\Programs\Git\cmd;D:\DevTools\apache-maven-3.8.4\bin;C:\Users\xande\AppData\Roaming\npm
+PATH = C:\Program Files\Common Files\Oracle\Java\javapath;C:\Python310\Scripts\;C:\Python310\;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Python39\Scripts\;C:\Python39\;C:\windows\system32;C:\windows;C:\windows\System32\Wbem;C:\windows\System32\WindowsPowerShell\v1.0\;C:\windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files\Calibre2\;C:\Program Files\Microsoft VS Code\bin;C:\ProgramData\chocolatey\bin;C:\Program Files\PuTTY\;C:\Program Files\LLVM\bin;C:\Program Files\Amazon\AWSCLIV2\;C:\Program Files (x86)\HP\IdrsOCR_15.2.10.1114\;C:\Program Files\dotnet\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files (x86)\dotnet\;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin;C:\Program Files\nodejs\;C:\Users\xande\AppData\Local\Microsoft\WindowsApps;C:\Users\xande\AppData\Local\GitHubDesktop\bin;C:\Users\xande\AppData\Local\Programs\Git\cmd;D:\DevTools\apache-maven-3.8.4\bin;C:\Users\xande\Ap 
+pData\Roaming\npm
 # environment
 COMPUTERNAME = XANDERPC2021
 # makefile (from 'Makefile', line 23)
@@ -163,9 +166,7 @@ MAKEFILES :=
 ^F = $(notdir $^)
 # environment
 PROMPT = $P$G
-# makefile (from 'Makefile', line 56)
-EMUARG_DEBUG := -ma --serial none --vsynchack off --turbotape on -s "/OSE.sym" -r :"/OSE.brk"
-# makefile (from 'Makefile', line 60)
+# makefile (from 'Makefile', line 52)
 LIBOBJECTS = src/oric_core_assembly.s
 # environment
 LOGONSERVER = \\XANDERPC2021
@@ -173,7 +174,7 @@ LOGONSERVER = \\XANDERPC2021
 VSCODE_LOG_NATIVE = false
 # environment
 USERNAME = xande
-# makefile (from 'Makefile', line 44)
+# makefile (from 'Makefile', line 41)
 MACH := -ma
 # environment
 COMMONPROGRAMFILES = C:\Program Files (x86)\Common Files
@@ -207,7 +208,7 @@ MAKE_VERSION := 4.3
 PLATFORMCODE = 1M
 # environment
 PROGRAMFILES(X86) = C:\Program Files (x86)
-# makefile (from 'Makefile', line 66)
+# makefile (from 'Makefile', line 58)
 LDFLAGS = -t $(CC65_TARGET) -C oricse_cc65_config.cfg -m $(PROJECT).map
 # environment
 USERDOMAIN_ROAMINGPROFILE = XANDERPC2021
@@ -217,17 +218,17 @@ NUMBER_OF_PROCESSORS = 16
 PUBLIC = C:\Users\Public
 # environment
 APPDATA = C:\Users\xande\AppData\Roaming
-# makefile (from 'Makefile', line 65)
+# makefile (from 'Makefile', line 57)
 CFLAGS = -t $(CC65_TARGET) --create-dep $(<:.c=.d) -Oirs -I include
 # environment
 HOMEDRIVE = C:
 # environment
 PROCESSOR_ARCHITECTURE = x86
-# makefile (from 'Makefile', line 46)
+# makefile (from 'Makefile', line 43)
 EMUDIR := /home/xahmol/oricutron/
 # environment
 VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
-# makefile (from 'Makefile', line 63)
+# makefile (from 'Makefile', line 55)
 CC65_TARGET = atmos
 # environment
 COMMONPROGRAMFILES(X86) = C:\Program Files (x86)\Common Files
@@ -247,22 +248,20 @@ SUFFIXES :=
 ALLUSERSPROFILE = C:\ProgramData
 # environment
 SESSIONNAME = Console
-# makefile (from 'Makefile', line 36)
-YM2MYM = $(OSDK)Ym2Mym -h1 -m8192
 # default
 .FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell nocomment grouped-target extra-prereqs archives jobserver output-sync load
 # environment
 REGIONCODE = EMEA
 # environment
 PROCESSOR_REVISION = a505
-# makefile (from 'Makefile', line 64)
+# makefile (from 'Makefile', line 56)
 CC = cl65
-# makefile (from 'Makefile', line 59)
+# makefile (from 'Makefile', line 51)
 SOURCES = src/main.c src/oric_core.c
 # environment
 PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 165 Stepping 5, GenuineIntel
 # variable set hash-table stats:
-# Load=123/1024=12%, Rehash=0, Collisions=13/200=6%
+# Load=121/1024=12%, Rehash=0, Collisions=13/184=7%
 
 # Pattern-specific Variable Values
 
@@ -270,15 +269,15 @@ PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 165 Stepping 5, GenuineIntel
 
 # Directories
 
-# src (key d:/Git/OricScreenEditor/src, mtime 1655126897): No files, no impossibilities so far.
-# . (key d:/Git/OricScreenEditor, mtime 1655130974): 24 files, no impossibilities.
+# src (key d:/Git/OricScreenEditor/src, mtime 1655284166): No files, no impossibilities so far.
+# . (key d:/Git/OricScreenEditor, mtime 1655284185): 21 files, no impossibilities.
 
-# 24 files, no impossibilities in 2 directories.
+# 21 files, no impossibilities in 2 directories.
 
 # Implicit Rules
 
 %.o: %.c
-#  recipe to execute (from 'Makefile', line 80):
+#  recipe to execute (from 'Makefile', line 72):
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 # 1 implicit rules, 0 (0.0%) terminal.
@@ -286,32 +285,32 @@ PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 165 Stepping 5, GenuineIntel
 
 BUILD/OSE.bin: src/main.o src/oric_core.o
 #  Implicit rule search has not been done.
-#  Last modified 2022-06-13 15:28:17
+#  Last modified 2022-06-15 11:09:26
 #  File has been updated.
-#  Needs to be updated (-q is set).
-# variable set hash-table stats:
-# Load=0/32=0%, Rehash=0, Collisions=0/6=0%
-#  recipe to execute (from 'Makefile', line 84):
+#  Successfully updated.
+#  recipe to execute (from 'Makefile', line 76):
 	$(CC) $(LDFLAGS) -o $@ $^ $(LIBOBJECTS)
 
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-12 22:16:45
+#  Last modified 2022-06-15 11:09:18
 #  File has been updated.
 #  Successfully updated.
 
 src/oric_core.c:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
+#  Implicit rule search has been done.
+#  Last modified 2022-06-15 10:38:18
+#  File has been updated.
+#  Successfully updated.
 
 clean:
 #  Phony target (prerequisite of .PHONY).
 #  Implicit rule search has not been done.
 #  File does not exist.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 95):
+#  recipe to execute (from 'Ma 
+kefile', line 87):
 	$(RM) $(SOURCES:.c=.o) $(SOURCES:.c=.d) $(PROGRAM) $(PROGRAM).map $(PROGRAM).brk $(PROGRAM).sym
 	cd BUILD; $(RM) *.*
 
@@ -321,42 +320,28 @@ include/osdklib.h:
 #  File has been updated.
 #  Successfully updated.
 
-src/oric_core.o: src/oric_core.c include/defines.h include/osdklib.h include/oric_core.h
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
+src/oric_core.o: src/oric_core.c src/oric_core.c include/defines.h include/osdklib.h include/oric_core.h
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'src/oric_core'
+#  Last modified 2022-06-15 11:09:26
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'Makefile', line 72):
+	$(CC) -c $(CFLAGS) -o $@ $<
 
 src/main.c:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-15 10:23:40
+#  Last modified 2022-06-15 10:38:35
 #  File has been updated.
 #  Successfully updated.
 
 src/main.o: src/main.c src/main.c include/defines.h include/osdklib.h include/oric_core.h
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'src/main'
-#  Last modified 2022-06-13 15:28:17
+#  Last modified 2022-06-15 11:09:26
 #  File has been updated.
-#  Needs to be updated (-q is set).
-# automatic
-# @ := src/main.o
-# automatic
-# * := src/main
-# automatic
-# < := src/main.c
-# automatic
-# + := src/main.c src/main.c include/defines.h include/osdklib.h include/oric_core.h
-# automatic
-# % := 
-# automatic
-# ^ := src/main.c include/defines.h include/osdklib.h include/oric_core.h
-# automatic
-# ? := src/main.c
-# automatic
-# | := 
-# variable set hash-table stats:
-# Load=8/32=25%, Rehash=0, Collisions=2/17=12%
-#  recipe to execute (from 'Makefile', line 80):
+#  Successfully updated.
+#  recipe to execute (from 'Makefile', line 72):
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 # Not a target:
@@ -371,32 +356,28 @@ all: BUILD/OSE.bin BUILD/OSE.dsk
 #  Implicit rule search has not been done.
 #  File does not exist.
 #  File has been updated.
-#  Needs to be updated (-q is set).
-# variable set hash-table stats:
-# Load=0/32=0%, Rehash=0, Collisions=0/6=0%
+#  Successfully updated.
 
 run: BUILD/OSE.dsk
 #  Phony target (prerequisite of .PHONY).
 #  Implicit rule search has not been done.
 #  File does not exist.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 104):
+#  recipe to execute (from 'Makefile', line 92):
 	cd $(EMUDIR); $(EMU) $(EMUARG) "$(PROJECT_DIR)/$(DISK_DSK)"
 
-run-debug: BUILD/OSE.dsk
+run-debug:
 #  Phony target (prerequisite of .PHONY).
 #  Implicit rule search has not been done.
 #  File does not exist.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 100):
-	@([ -e $(PROJECT).brk ] || touch $(PROJECT).brk) || echo -n
-	cd $(EMUDIR); $(EMU) $(EMUARG_DEBUG) "$(PROJECT_DIR)/$(DISK_DSK)"
 
 BUILD/OSE.dsk: BUILD/OSE.bin
 #  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  recipe to execute (from 'Makefile', line 88):
+#  Last modified 2022-06-15 11:09:26
+#  File has been updated.
+#  Successfully updated.
+#  recipe to execute (from 'Makefile', line 80):
 	$(OSDK)header $(PROGRAM) BUILD/$(PROJECT).tap 0x0501
 	$(OSDK)tap2dsk -iCLS:$(PROJECT) -c20:3 -n$(PROJECT) BUILD/$(PROJECT).tap OSEHS1.tap OSEHS2.tap OSEHS3.tap OSEHS4.tap OSETSC.tap $(DISK_DSK)
 	$(OSDK)old2mfm $(DISK_DSK)
@@ -422,7 +403,7 @@ include/oric_core.h:
 # Not a target:
 src/main.d:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-13 15:28:16
+#  Last modified 2022-06-15 11:09:26
 #  File has been updated.
 #  Successfully updated.
 
@@ -434,7 +415,7 @@ src/main.d:
 # Not a target:
 src/oric_core.d:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-13 15:28:17
+#  Last modified 2022-06-15 11:09:26
 #  File has been updated.
 #  Successfully updated.
 
@@ -446,12 +427,13 @@ src/oric_core.d:
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 45 / storage = 485 B / avg = 10 B
-# current buf: size = 8174 B / used = 485 B / count = 45 / avg = 10 B
+# strcache buffers: 1 (0) / strings = 43 / storage = 451 B / avg = 10 B
+# current buf: size = 8 
+174 B / used = 451 B / count = 43 / avg = 10 B
 
-# strcache performance: lookups = 96 / hit rate = 53%
+# strcache performance: lookups = 93 / hit rate = 53%
 # hash-table stats:
-# Load=45/8192=1%, Rehash=0, Collisions=0/96=0%
-# Finished Make data base on Wed Jun 15 10:28:53 2022
+# Load=43/8192=1%, Rehash=0, Collisions=0/93=0%
+# Finished Make data base on Wed Jun 15 14:50:01 2022
 
  
