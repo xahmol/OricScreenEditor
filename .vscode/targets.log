@@ -11,7 +11,7 @@ Makefile:29: pipe: No error
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Mon Jun 13 16:40:06 2022
+# Make data base, printed on Wed Jun 15 10:28:53 2022
 
 # Variables
 
@@ -26,7 +26,7 @@ USERPROFILE = C:\Users\xande
 # environment
 LOCALAPPDATA = C:\Users\xande\AppData\Local
 # environment
-VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-d20ffb3c-25c0-4d5b-955b-f77963332391-sock
+VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-6f5063b0-5250-4028-a7c4-fdbe53626bc6-sock
 # environment
 VSCODE_CWD = C:\Program Files\Microsoft VS Code
 # environment
@@ -46,7 +46,7 @@ HXCFE := /home/xahmol/hxcfloppyemu-cod/HxCFloppyEmulator/HxCFloppyEmulator_cmdli
 # environment
 DOKANLIBRARY1_LIBRARYPATH_X64 = C:\Program Files\Dokan\Dokan Library-1.4.1\lib\
 # environment
-CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_28796_ECXPIEISAXLNQIAF
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_31712_QELGXPHHEFDNPUJC
 # environment
 VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # default
@@ -64,7 +64,7 @@ VSCODE_LOG_STACK = false
 # automatic
 %F = $(notdir $%)
 # environment
-VSCODE_CODE_CACHE_PATH = C:\Users\xande\AppData\Roaming\Code\CachedData\c3511e6c69bb39013c4a4b7b9566ec1ca73fc4d5
+VSCODE_CODE_CACHE_PATH = C:\Users\xande\AppData\Roaming\Code\CachedData\4af164ea3a06f701fe3e89a2bcbb421d2026b68f
 # makefile (from 'Makefile', line 51)
 EMUARG := -ma --serial none --vsynchack off --turbotape on
 # environment
@@ -114,7 +114,7 @@ MAKEFILE_LIST := Makefile src/main.d src/oric_core.d
 # environment
 VSCODE_VERBOSE_LOGGING = true
 # environment
-VSCODE_PID = 28796
+VSCODE_PID = 31712
 # automatic
 ?D = $(patsubst %/,%,$(patsubst %\,%,$(dir $?)))
 # environment
@@ -236,7 +236,7 @@ ELECTRON_RUN_AS_NODE = 1
 # environment
 TEMP = C:\Users\xande\AppData\Local\Temp
 # environment
-VSCODE_IPC_HOOK = \\.\pipe\c7276ac39fbbf2dfb6220de2f50e8e58-1.67.2-main-sock
+VSCODE_IPC_HOOK = \\.\pipe\c7276ac39fbbf2dfb6220de2f50e8e58-1.68.0-main-sock
 # default
 .RECIPEPREFIX := 
 # automatic
@@ -328,7 +328,7 @@ src/oric_core.o: src/oric_core.c include/defines.h include/osdklib.h include/ori
 
 src/main.c:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-13 16:17:18
+#  Last modified 2022-06-15 10:23:40
 #  File has been updated.
 #  Successfully updated.
 
@@ -452,6 +452,6 @@ src/oric_core.d:
 # strcache performance: lookups = 96 / hit rate = 53%
 # hash-table stats:
 # Load=45/8192=1%, Rehash=0, Collisions=0/96=0%
-# Finished Make data base on Mon Jun 13 16:40:06 2022
+# Finished Make data base on Wed Jun 15 10:28:53 2022
 
  

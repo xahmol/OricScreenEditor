@@ -1,5 +1,12 @@
 make.exe --dry-run --always-make --keep-going --print-directory
 make: Entering directory 'd:/Git/OricScreenEditor'
+ 
+process_begin: CreateProcess(NULL, dirname d:/Git/OricScreenEditor/Makefile, ...) failed.
+Makefile:25: pipe: No error
+
+process_begin: CreateProcess(NULL, pwd, ...) failed.
+Makefile:29: pipe: No error
+
 cl65 -c -t atmos --create-dep src/main.d -Oirs -I include -o src/main.o src/main.c
 cl65 -c -t atmos --create-dep src/oric_core.d -Oirs -I include -o src/oric_core.o src/oric_core.c
 cl65 -t atmos -C oricse_cc65_config.cfg -m OSE.map -o BUILD/OSE.bin src/main.o src/oric_core.o src/oric_core_assembly.s
@@ -9,8 +16,3 @@ cl65 -t atmos -C oricse_cc65_config.cfg -m OSE.map -o BUILD/OSE.bin src/main.o s
 cd /home/xahmol/hxcfloppyemu-cod/HxCFloppyEmulator/HxCFloppyEmulator_cmdline/trunk/build/; ./hxcfe -finput:"/BUILD/OSE.dsk" -foutput:"/BUILD/OSE.hfe" -conv:HXC_HFE
 make: Leaving directory 'd:/Git/OricScreenEditor'
  
-process_begin: CreateProcess(NULL, dirname d:/Git/OricScreenEditor/Makefile, ...) failed.
-Makefile:25: pipe: No error
-process_begin: CreateProcess(NULL, pwd, ...) failed.
-Makefile:29: pipe: No error
-

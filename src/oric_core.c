@@ -107,6 +107,7 @@ void ORIC_FillArea(unsigned char row, unsigned char col, unsigned char character
 void ORIC_Init(void)
 {
 	// Init screen
+	setflags(SCREEN+NOKEYCLICK);
     bgcolor(COLOR_BLACK);
     textcolor(COLOR_WHITE);
     clrscr();
@@ -114,6 +115,7 @@ void ORIC_Init(void)
 
 void ORIC_Exit(void)
 {
+	setflags(SCREEN);
 	clrscr();
 }
 

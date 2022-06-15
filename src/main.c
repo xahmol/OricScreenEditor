@@ -986,10 +986,12 @@ void lineandbox(unsigned char draworselect)
     // Input: draworselect: Choose select mode (0) or draw mode (1)
 
     unsigned char key;
-    unsigned char x,y;
+    unsigned char x,y,select_orgx,select_orgy;
 
     select_startx = screen_col + xoffset;
     select_starty = screen_row + yoffset;
+    select_orgx = select_startx;
+    select_orgy = select_starty;
     select_endx = select_startx;
     select_endy = select_starty;
     select_accept = 0;
@@ -1009,43 +1011,81 @@ void lineandbox(unsigned char draworselect)
         {
         case CH_CURS_RIGHT:
             cursormove(0,1,0,0);
-            select_endx = screen_col + xoffset;
-            for(y=select_starty;y<select_endy+1;y++)
+            if(select_orgx>select_startx)
             {
-                plotvisible(y,select_endx,1);
+                for(y=select_starty;y<select_endy+1;y++)
+                {
+                    plotvisible(y,select_startx,0);
+                }
+                select_startx = screen_col + xoffset;
+            }
+            else
+            {
+                select_endx = screen_col + xoffset;
+                for(y=select_starty;y<select_endy+1;y++)
+                {
+                    plotvisible(y,select_endx,1);
+                }
             }
             break;
 
         case CH_CURS_LEFT:
-            if(select_endx>select_startx)
+            cursormove(1,0,0,0);
+            if(select_endx>select_orgx)
             {
-                cursormove(1,0,0,0);
                 for(y=select_starty;y<select_endy+1;y++)
                 {
                     plotvisible(y,select_endx,0);
                 }
                 select_endx = screen_col + xoffset;
             }
+            else
+            {
+                select_startx = screen_col + xoffset;
+                for(y=select_starty;y<select_endy+1;y++)
+                {
+                    plotvisible(y,select_startx,1);
+                }
+            }
             break;
 
         case CH_CURS_UP:
-            if(select_endy>select_starty)
+            cursormove(0,0,1,0);
+            if(select_endy>select_orgy)
             {
-                cursormove(0,0,1,0);
                 for(x=select_startx;x<select_endx+1;x++)
                 {
                     plotvisible(select_endy,x,0);
                 }
                 select_endy = screen_row + yoffset;
             }
+            else
+            {
+                select_starty = screen_row + yoffset;
+                for(x=select_startx;x<select_endx+1;x++)
+                {
+                    plotvisible(select_starty,x,1);
+                }
+            }
             break;
 
         case CH_CURS_DOWN:
             cursormove(0,0,0,1);
-            select_endy = screen_row + yoffset;
-            for(x=select_startx;x<select_endx+1;x++)
+            if(select_orgy>select_starty)
             {
-                plotvisible(select_endy,x,1);
+                for(x=select_startx;x<select_endx+1;x++)
+                {
+                    plotvisible(select_starty,x,0);
+                }
+                select_starty = screen_row + yoffset;
+            }
+            else
+            {
+                select_endy = screen_row + yoffset;
+                for(x=select_startx;x<select_endx+1;x++)
+                {
+                    plotvisible(select_endy,x,1);
+                }
             }
             break;
 
@@ -2499,7 +2539,6 @@ void main()
     memcpy((void*)CHARSET_SWAP,(void*)CHARSET_STD,768);
  
     // Wait for key press to start application
-    setflags(SCREEN);
     printcentered("Press key.",10,26,20);
     
     cgetc();
