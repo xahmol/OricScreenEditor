@@ -1,5 +1,5 @@
 # Oric Screen Editor
-Commodore Plus/4 column screen editor
+Screen editor for the Oric Atmos
 
 ## Contents:
 
@@ -27,13 +27,9 @@ Commodore Plus/4 column screen editor
 
 [Write mode](#write-mode)
 
-[Color write mode](#color-write-mode)
-
-[OSE2PRG utility](#OSE2prg-utility)
-
 [Color value reference](#color-value-reference)
 
-[Attribute code reference](#attribute-code-reference)
+[Serial attribute code reference](#serial-attribute-code-reference)
 
 [File format reference](#file-format-reference)
 
@@ -45,51 +41,49 @@ Commodore Plus/4 column screen editor
 ## Version history and download
 ([Back to contents](#contents))
 
-[Link to latest build](https://github.com/xahmol/OricScreenEditor/raw/main/OricScreenEditor-v099-20220525-2330.zip)
+Link to latest builds:
+- [.DSK disk image](https://github.com/xahmol/OricScreenEditor/raw/main/BUILD/OSE.dsk)
+- [.HFE disk image](https://github.com/xahmol/OricScreenEditor/raw/main/BUILD/OSE.hfe)
 
-Version v099-20220525-2330:
+Version v099-20220615-1454:
 - First released beta version based on [VDCSE](https://github.com/xahmol/VDCScreenEdit) version v099-20220324-1527
 
 ## Introduction
 ([Back to contents](#contents))
 
-Oric Screen Editor is an editor to create text based screens for the Commodore Plus/4. It fully supports using a user defined character set.
+Oric Screen Editor is an editor to create text based screens for the Oric Atmos. It fully supports using user defined character sets.
 
 Main features of the program:
-- Support for screen maps larger than 40x25 characters. Screens can be up to 15 KiB (15.615 bytes), all sizes fitting in that memory with width of 40 at minimum and heigth of 25 at minimum are supported. NB: As both the character data as the attribute data needs to be stored, a screen takes width times height times 2 bytes in storage. So 15k would fit up to 7 standard 40x25 screens to be distributed over width and height, so e.g. 2 screens wide and 3 screens high (80x75 characters).
+- Support for screen maps larger than 40x25 characters. Screens can be up to 8 KiB (8.192 bytes), all sizes fitting in that memory with width of 40 at minimum and heigth of 27 at minimum are supported.
 - Supports resizing canvas size, clear or fill the canvas
-- Support for loading user defined charsets (should be standard charsets of 128 characters of 8 bits width and 8 bits height that will be hardware reversed for screencodes higher than 128).
-- Includes a simple character editor to change characters on the fly and directly see the result in your designed screen (for editing a full character set one of the many alternatives for C64 character set editing is suggested).
-- Supports luminance and blink attributes of the TED, giving 121 colors and the ability for flashing characters.
-- In not redefined charactersets lowercase and uppercase character set can be selected (but bot can not be used at the same time).
-- User definable background and border color.
-- Write mode to freely type characters with the keyboard, supporting all printable PETSCII characters and also supporting Commodore or Control + 0-9 keys for selecting colors and RVS On/Off
-- Color write mode to freely type attributes and colors
+- Support for loading user defined charsets (should be standard charsets of 96 characters of 6 bits width and 8 bits height, alternate charsets of 80 characters or combined charsets of 176 characters).
+- Includes a simple character editor to change characters on the fly and directly see the result in your designed screen.
+- Supports the Oric serial atribites for ink, paper and character modifiers (standard vs alternate charset, double height, blink).
+- Write mode to freely type characters with the keyboard
 - Line and box mode for drawing lines and boxes
 - Select mode to cut, copy, delete or repaint (only color or all attributes) the selection.
-- Move mode to scroll the screen contents (due to memory constraints only for the 40x25 viewport)
-- Palette mode, including visual PETSCII mode, to visually select characters and colors
+- Move mode to scroll the screen contents (due to memory constraints only for the 40x27 viewport)
+- Palette mode, including visual charmap mode, to visually select characters and colors
 - Favorite slots to quickly select 10 favorite characters
-- TED2PRG utility to convert a 40x25 OSE project to a stand-alone executable for the Commodore Plus/4
 
 ## Start program
 ([Back to contents](#contents))
 
-Mount the OSE disk image. Choose the .D641 or .D81 image depending on what is supported on the hardware or emulator you use. The program will run the same from both images, but the .D81 will be providing faster load times and more available free storage space for your screens if you want to save your work in this same image. The disk can be mounted from any valid device ID number.
+Mount the OSE disk image. Choose the .DSK or .HFE image depending on what is supported on the hardware or emulator you use (in general: .HFE for Cumana Reborn, .DSK for emulator).
 
-Run the program by entering LOAD "OSE",\<device number\> and then enter RUN (or use other methods like JiffyDOS shortcodes or your favorite file browser). The OSE file (with PRG file type) is the executable that should be started, the other files on the disk are supporting binaries, title screen or help screens.
+The OSE executable will autostart on mounting the disk. If not, just type OSE\<ENTER\>.
 
 Description of contents of the disk image:
 
-- OSE                     (PRG):      Main executable
-- OSE.TSCR                (PRG):      Title screen
-- OSE.HSC1                (PRG):      Help screen for main mode
-- OSE.HSC2                (PRG):      Help screen for character edit mode
-- OSE.HSC3                (PRG):      Help screen for select, move and line/box modes
-- OSE.HSC4                (PRG):      Help screen for write and color write modes
-- OSE.PETV                (PRG):      Mapping table for visual PETSCII map
-- OSE2PRG                 (PRG):      Executable of the OSE2PRG utility
-- OSE2PRG.ASS             (PRG):      BASIC header and assembly part for generating executables
+|Filename|Extension|Description|
+|---|---|---|
+|OSE|.COM|Main executable
+|OSEHS1|.BIN|Help screen for main mode
+|OSEHS2|.BIN|Help screen for character edit and palette modes
+|OSEHS3|.BIN|Help screen for select, move and line/box modes
+|OSEHS4|.BIN|Help screen for write and color write modes
+|OSETSC|.BIN|Title screen
+
 
 (Fun fact: all screens have actually been created using OSE as editor)
 
@@ -102,89 +96,94 @@ After the title screen, the program starts in this mode. At start the screen sho
 
 ![Screen in main mode](https://github.com/xahmol/OricScreenEditor/blob/main/screenshots/OSE%20empty%20startscreen.png?raw=true)
 
-Only a blinking cursor with the presently selected [screencode](https://sta.c64.org/cbm64scr.html) and attributes is visible.
+Only a inversed cursor with the presently selected screencode is visible.
 
 Press these keys in main mode for editing:
 
 |Key|Description
 |---|---|
 |**Cursor keys**|Move cursor
-|**+**|Next character (increase screen code)
+|**+** or **=**|Next character (increase screen code)
 |**-**|Previous character (decrease screen code)
 |**0-9**|Select character from favorite slot with corresponding number
-|**SHIFT + 1-9**|Store character to favorite slot with corresponding number
-|**\***|Store character to favorite slot with number 0 (shift 0 does not exist)
-|**,**|Previous color (decrease color number)
-|**.**|Next color (increase color number)
-|**:**|Decrease luminance
-|**;**|Increase luminance
+|**SHIFT + 0-9**|Store character to favorite slot with corresponding number
+|**,**|Previous ink (decrease color number)
+|**.**|Next ink (increase color number)
+|**;**|Decrease paper (decrease color number)
+|**\'**|Increase paper (increase color number)
 |**SPACE**|Plot with present screen code and attributes
 |**DEL**|Clear present cursor position (plot white space)
 |**B**|Toggle '**B**link' attribute
-|**A**|Toggle lowercase/uppercase
+|**A**|Toggle **A**lternate or Standard character set
+|**D**|Toggle **D**ouble height attribute
+|**I**|Plot a change **I**nk modifier attribute for the present selected ink color
+|**O**|Plot a change Paper modifier attribute for the present selected paper color
+|**U**|Plot a characterset modifier attribute for the present selected charset selection, double size and blink attributes
 |**E**|Go to 'character **E**dit mode' with present screen code
 |**G**|**G**rab underlying character and attribute at cursor position
 |**W**|Go to '**W**rite mode'
-|**C**|Go to '**C**olor write mode'
 |**L**|Go to '**L**ine and box mode'
 |**M**|Go to '**M**ove mode'
 |**S**|Go to '**S**elect mode'
 |**P**|Go to '**P**alette mode'
 |**T**|**T**ry mode
-|**I**|Toggle '**I**nverse': toggle increase/decrease screencode by 128
-|**HOME**|Move cursor to upper left corner of canvas
-|**F1**|Go to main menu
-|**F6**|Toggle statusbar visibility
-|**HELP**|Help screen
+|**R**|Toggle '**R**everse': toggle increase/decrease screencode by 128
+|**FUNCT+1**|Go to main menu
+|**FUNCT+6**|Toggle statusbar visibility
+|**FUNT+8**|Help screen
+
+**NB**: Within Oricutron using the default keyboard mapping, the FUNCT key is assigned to the ALT key on the PC keyboard.
 
 *Moving cursor*
 
-Press the **cursor keys** to move the cursor around the screen. If the canvas size is bigger than the 80x25 screensize, the sreen will scroll on reaching the edges.
+Press the **cursor keys** to move the cursor around the screen. If the canvas size is bigger than the 40x27 screensize, the sreen will scroll on reaching the edges.
 
-Pressing **HOME** will return the cursor to the upper left position.
+*Selecting the screencode to plot*
 
-*Selecting the [screencode](https://sta.c64.org/cbm64scr.html) to plot*
+The **+** or **-** key will increase resp. decrease the selected screencode by one. The cursor will update to the presently selected screencode.
 
-The **+** or **-** key will increase resp. decrease the selected [screencode](https://sta.c64.org/cbm64scr.html) by one. The cursor will update to the presently selected [screencode](https://sta.c64.org/cbm64scr.html).
+Pressing **R** will increase the screencode by 128 if the present screencode is lower than 128, otherwise decrease by 128. This will enable/disable the reverse bit for the hardware reversing of the character.
 
-Pressing **I** will increase the [screencode](https://sta.c64.org/cbm64scr.html) by 128 if the present [screencode](https://sta.c64.org/cbm64scr.html) is lower than 128, otherwise decrease by 128. This will emulate RVS On / RVS Off.
-
-*Selecting the [screencode](https://sta.c64.org/cbm64scr.html) to plot from a favotite slot*
+*Selecting the screencode to plot from a favorite slot*
 
 In OSE 10 positions are available to store your most frequently used characters in. Pressing one of the **0-9** keys selects the favorite with the corresponding number.
 
-*Storing the present [screencode](https://sta.c64.org/cbm64scr.html) to a favorite slot*
+*Storing the present screencode to a favorite slot*
 
-Pressing **SHIFT** plus **1-9** stores the presently selected character to the corresponding favorite slot. As SHIFT+0 is the same as 0 on the Plus/4, press **\*** for favorite position 0.
+Pressing **SHIFT** plus **0-9** stores the presently selected character to the corresponding favorite slot.
 
 *Selecting the attributes to plot*
 
-Increase or decrease the [color code](#color-value-reference) by one by pressing the **.** resp. **,** key. Increase or decrease the luminance by one by pressing the **;** resp. **:** key.  Pressing **B** or **A** will toggle the **B**link or lowercase charset attribute.
-The cursor will update to show the updated attribute code.
+Increase or decrease the [color code](#color-value-reference) by one by pressing the **.** resp. **,** key for the Ink color, or **;** resp. **\'** for the Paper color. Pressing **B**, **D** or **A** will toggle the **B**link, **D**ouble size or **A**lternate charset attribute.
 
 *Plotting and deleting a character*
 
-Press **SPACE** to plot the presently selected character in the presently selected attributes at the present cursor position. **DEL** will delete the character and attribute value at the present position.
+Press **SPACE** to plot the presently selected character at the present cursor position. **DEL** will delete the character or attribute value at the present position and replace it with a SPACE as character.
 Press **T** to preview how the selected character would look like if plotted without cursor blinking. Then press **SPACE** to confirm plotting the character, or any other key to cancel.
+
+*Plotting serial attributes*
+
+Due to the way the Oric handles [color and attribute changes](#serial-attribute-code-reference), every screen position is either an attribute modifier or a character, but never both at the same time. For this reason, on plotting a character no atrribute is plotted. The user of OSE needs to plot the serial attributes seperately by its own desire.
+To do so, press **I** for plotting an **I**nk modifier for the present ink color, **P** for plotting a **P**aper modifier for the present paper color and **U** for plotting a characterset modifier for the present character atrributes (the alternate, double and blink toggles).
 
 *Grabbing a character*
 
-Pressing **G** will 'grab' the character and attributes at the present cursor position and change the selected character [screencode](https://sta.c64.org/cbm64scr.html) and attribute to these values for use in all other edit functions.
+Pressing **G** will 'grab' the character or attributes at the present cursor position and change the selected character screencode or attribute to these values for use in all other edit functions.
 
 *Character edit mode*
 
-This will enter [character edit mode](#character-editor) and start with editing the presently selected [screencode](https://sta.c64.org/cbm64scr.html). Tip: if you want to edit a specific character on the screen, grab that character first by moving the cursor on that character and press **G** for grab.
+This will enter [character edit mode](#character-editor) and start with editing the presently selected screencode. Tip: if you want to edit a specific character on the screen, grab that character first by moving the cursor on that character and press **G** for grab.
 
 *Enter edit modes*
 
-Press **S** ([Select mode](#select-mode)) , **M** ([Move mode](#move-mode)), **L** ([Line and box mode](#line-and-box-mode)), **W** ([Write mode](#write-mode)) or **C** ([Color write mode](#color-write-mode)) for entering the corresponding edit modes.
-Reference is made to the specific sections in this readme for these modes (click the links). From all modes, return to main mode by pressing **ESC** or **STOP**.
+Press **S** ([Select mode](#select-mode)) , **M** ([Move mode](#move-mode)), **L** ([Line and box mode](#line-and-box-mode)) or **W** ([Write mode](#write-mode)) for entering the corresponding edit modes.
+Reference is made to the specific sections in this readme for these modes (click the links). From all modes, return to main mode by pressing **ESC**.
 
 *Toggle statusbar visibility*
-Press **F6** to toggle between the statusbar being visible (default) or not.
+Press **FUNCT+6** to toggle between the statusbar being visible (default) or not.
 
 *Help screen*
-Press **HELP** to show a help screen with all keyboard commands for this mode.
+Press **FUNCT+8** to show a help screen with all keyboard commands for this mode.
 
 ## Statusbar
 ([Back to contents](#contents))
@@ -196,24 +195,24 @@ If enabled, the statusbar is plotted as this at the lowest line of the screen:
 From left to right, this status bar shows:
 
 - Mode: mode the program is in (such as Main, Select, Line/Box, Palette or Character Editor).
-- X,Y: X and Y co-ordinates of the cursor (co-ordinates of the large full screen, and not only the visible screen, if a larger screen than 80 by 25 characters is selected)
-- SC: Screemcode, the present selected character to plot, first as screencode number in hexadecimal, second as actual visual character.
-- C: Color, the present selected color to plot
-- L: Luminance, the present selected luminance to plot
-- The actual plot color and luminance visualised
-- Atrributes: this shows the enabled attributes, B for Blink and A for lowercase character set. If the abbreviation is shown, the corresponding attribute is enabled, else disabled.
+- X,Y: X and Y co-ordinates of the cursor (co-ordinates of the large full screen, and not only the visible screen, if a larger screen than 40 by 27 characters is selected. Normally shows in decimal, but shows in hexadecimal if X or Y maximum size is higher than 99)
+- C: Screemcode, the present selected character to plot, first as screencode number in hexadecimal, second as actual visual character.
+- S: The screencode in memory underneath the cursor position. Will show either the character code (bigger than $20) or the attribute code (smaller than $20) in hexadecimal
+- I: Ink, the present selected color for the ink. First as number 0-7, then as visual color.
+- P: Paper, the present selected color for the paper. First as number 0-7, then as visual color.
+- The last three positions show the character set modifier attributes that are enabled: A if the alternate charset is enabled, D for double size and B for blink.
 
 The status bar auto hides if the cursor is moved to the lowest visible line on the screen, and pops up again (if enabled in the first place) when the cursor moves up.
 
-Pressing **F6** toggles statusbar visibility in every mode.
+Pressing **FUNCT+6** toggles statusbar visibility in every mode.
 
 ## Main menu
 ([Back to contents](#contents))
 
-From [main mode](#main-mode), press **F1** to go to the main menu. The following menu will pop up:
+From [main mode](#main-mode), press **FUNCT+1*** to go to the main menu. The following menu will pop up:
 ![OSE Main Menu](https://github.com/xahmol/OricScreenEditor/blob/main/screenshots/OSE%20Main%20menu.png?raw=true)
 
-(NB: Note that if your design uses a changed character set, the program will load the standard system font and your design might temporarily look incorrect. This will be restored on exiting the main menu. Also, the colors of the main menu and the highlight colors might differ if you have chosen a non-black background color, to ensure visibility of the menus).
+(NB: Note that if your design uses a changed character set, the program will load the standard system font and your design might temporarily look incorrect. This will be restored on exiting the main menu. Also, the pulldown menus will show a black shade to the right due to Oric system limitations).
 
 Navigation in this menu is performed by the following keys:
 
@@ -222,7 +221,7 @@ Navigation in this menu is performed by the following keys:
 |**Cursor LEFT / RIGHT**|Move between main menu options
 |**Cursor UP/ DOWN**|Move between pulldown menu options
 |**RETURN**|Select highlighted menu option
-|**ESC** / **STOP**|Leave menu and go back
+|**ESC** |Leave menu and go back
 
 **_Screen menu_**
 
@@ -230,7 +229,7 @@ Navigation in this menu is performed by the following keys:
 
 *Width: Resize width*
 
-Resize the canvas width by entering the new width. You can both shrink as expand the width. Minimum width is 40, maximum width depends on the canvas height and the result fitting in the maximum of 15 KiB memory size allocation.
+Resize the canvas width by entering the new width. You can both shrink as expand the width. Minimum width is 40, maximum width depends on the canvas height and the result fitting in the maximum of 8 KiB memory size allocation.
 
 Note that with shrinking the width you might loose data, as all characters right of the new width will be lost. That is why on shrinking a pulldown menu will pop-up asking if you are sure. Select the desired answer (yellow highlighted position if using a black background).
 
@@ -238,47 +237,31 @@ Note that with shrinking the width you might loose data, as all characters right
 
 *Height: Resize height*
 
-Similar to resize width, with this option you can resize the height in the same way. Minimum height is 25, maximum again dependent on width given maximum of 15 KiB memory allocation.
+Similar to resize width, with this option you can resize the height in the same way. Minimum height is 27, maximum again dependent on width given maximum of 8 KiB memory allocation.
 
 Also here: on shrinking you might loose data, which is lost if you confirm.
 
 ![Resize height](https://github.com/xahmol/OricScreenEditor/blob/main/screenshots/OSE%20Screen%20menu%20-%20height.png?raw=true)
 
-*Background: Change background color*
-
-Select the background color. Note that if the chosen color is not black, the menu and popup colors will be changed to black on colors with intensity bit on, and white on colors with intensity bit off.
-
-The color can be selected with the **+** and **-** keys to increase resp. decrease the color value, amd the **+.** and **-,** keys to increase resp. decrease the luminance value. The background color will change directly accordingly. Press **ENTER** to accept the new color, or **ESC** or **STOP** to cancel.
-
-![Change background color](https://github.com/xahmol/OricScreenEditor/blob/main/screenshots/OSE%20Screen%20menu%20-%20bgcolor.png?raw=true)
-
-*Border: Change border color*
-
-Select the background color. Note that if the chosen color is not black or grey, the menu and popup colors will be changed to black on colors with intensity bit on, and white on colors with intensity bit off.
-
-The color can be selected with the **+** and **-** keys to increase resp. decrease the color value, amd the **+.** and **-,** keys to increase resp. decrease the luminance value. Press **ENTER** to accept the new color, or **ESC** or **STOP** to cancel.
-
-![Change border color](https://github.com/xahmol/OricScreenEditor/blob/main/screenshots/OSE%20Screen%20menu%20-%20bordercolor.png?raw=true)
-
 *Clear: Clear the canvas*
 
-Selecting this menu option will clear the canvas (which means filling the canvas with spaces, with attribute code for the color white, no other attributes). No confirmation will be asked.
+Selecting this menu option will clear the canvas (which means filling the canvas with spaces, with attribute code for the selected color and selected paper plotted in the first two columns of the screen). No confirmation will be asked.
 
 *Fill: Fill the canvas*
 
-Similar to clear, but this will fill the canvas with the present selected [screencode](https://sta.c64.org/cbm64scr.html) and attributes (so the values that the cursor was showing).
+Similar to clear, but this will fill the canvas with the present selected screencode (so the values that the cursor was showing).
 
 **_File menu_**
 
 ![File menu](https://github.com/xahmol/OricScreenEditor/blob/main/screenshots/OSE%20filemenu.png?raw=true)
 
-In general: pressing **ESC** or **STOP** on any devide ID or filename input dialogue cancels the file operation.
+In general: pressing **ESC** on a filename input dialogue cancels the file operation. Wildcards can be used in filenames for loading: **\*** for allowing anything afterwards, **?** to allow any character for the given position.
+
+**NB: In the present version, error handling of file opeations is ppor, for example entering incorrect / inexisting filenames exit the program to BASIC with poor recovery possibility of unsaved work. Advice is to save often on work in progress versions.**
 
 *Save screen*
 
-This option saves the present canvas to disk. First the device ID number is asked of the device to save to (should be between 8 and 30 and pointing to an active disk system with that ID number). Then the filename is asked (max 15 characters in length).
-
-If a file with that name is already existing, confirmation is asked. Confirming will delete the old file before saving the new file.
+This option saves the present canvas to disk. The filename is asked (max 9 characters in length).
 
 In case of a file error, a popup will be shown with the error number.
 
@@ -286,7 +269,7 @@ In case of a file error, a popup will be shown with the error number.
 
 *Load screen*
 
-With this option you can load a screen from disk. Dialogue for this option is very similar to the Save screen option above. Device ID and filename will be asked, but next to that the width and height in characters will be asked as that can not be read from a standard screen file.
+With this option you can load a screen from disk. Dialogue for this option is very similar to the Save screen option above. Filename will be asked, but next to that the width and height in characters will be asked as that can not be read from a standard screen file.
 
 ![Load screen](https://github.com/xahmol/OricScreenEditor/blob/main/screenshots/OSE%20File%20menu%20-%20load.png?raw=true)
 
@@ -297,21 +280,29 @@ Similar to save screen, but with this option also the canvas metadata (width, he
 ![Save project](https://github.com/xahmol/OricScreenEditor/blob/main/screenshots/OSE%20File%20menu%20-%20projsave.png?raw=true)
 
 *Load project*
-Loads a project: the metadata, the screen and the charsets. Provide the filename without the .xxxx suffix (.proj,.scrn,.chr1 and .chr2). As the canvas width and height is now read from the metadata, no user input on canvas size is needed.
+Loads a project: the metadata, the screen and the charsets. Provide the filename without the two letter suffix pj,sc,cs and ca). As the canvas width and height is now read from the metadata, no user input on canvas size is needed.
 
 ![Load project](https://github.com/xahmol/OricScreenEditor/blob/main/screenshots/OSE%20File%20menu%20-%20projload.png?raw=true)
+
+*Save combined*
+
+This option saves the present canvas and charsets to disk in a single file (First 768 bytes of the standard charset, 256 bytes of empty space (the first 32 non-visible positions of the alternate charset), then 640 bytes of the visble alternate charset, finally the screenmap). Only makes sense for 40x27 standard screens, with the benefit that they can be loaded in one go with $B500 as base address. For the rest exactly similar in dialogue as Save Screen.
+
+*Load combined*
+
+This option loads the present canvas and charsets to disk in a single file (First 768 bytes of the standard charset, 256 bytes of empty space (the first 32 non-visible positions of the alternate charset), then 640 bytes of the visble alternate charset, finally the screenmap). For the rest exactly similar in dialogue as Save Screen.
 
 **_Charset: Load and save character set_**
 
 ![Charset menu](https://github.com/xahmol/OricScreenEditor/blob/main/screenshots/OSE%20charsetmenu.png?raw=true)
 
-In this menu you can select the options to Load or Save the character set.
+In this menu you can select the options to Load or Save the character sets for either the standard or alternate charsets separately (768 bytes resp. 640 bytes files) or as a combined file for both character sets (768 standard charset, 256 bytes empty space, 640 bytes alternate charset).
 Dialogue of these options is similar to the screen save and load options: enter device ID and filename.
 
 **_Information: Version information, exit program_**
 
 
-![Information menu](https://github.com/xahmol/OricScreenEditor/blob/main/screenshots/OSE%20Screen%20Information%2016k.png?raw=true)
+![Information menu](https://github.com/xahmol/OricScreenEditor/blob/main/screenshots/OSE%20Screen%20Information.png?raw=true)
 
 
 *Information*
@@ -341,8 +332,7 @@ Keyboard commands in this mode:
 |**+**|Next character (increase screen code)
 |**-**|Previous character (decrease screen code)
 |**0-9**|Select character from favorite slot with corresponding number
-|**SHIFT + 1-9**|Store character to favorite slot with corresponding number
-|**\***|Store character to favorite slot with number 0 (shift 0 does not exist)
+|**SHIFT + 0-9**|Store character to favorite slot with corresponding number
 |**SPACE**|Toggle pixel at cursor position (plot/delete pixel)
 |**DEL**|Clear character (delete all pixels of present character)
 |**I**|**I**nverse character
@@ -351,28 +341,27 @@ Keyboard commands in this mode:
 |**C**|**C**opy present character
 |**V**|Paste present character
 |**X / Y**|Mirror in **X** axis or **Y**-axis
-|**O**|R**O**tate clockwise
 |**L** / **R** / **U** / **D**|Scroll **L**eft, **R**ight, **U**p or **D**own
 |**H**|Input **H**ex value for line at cursor position
-|**ESC** / **STOP**|Leave character mode and go back to main mode
-|**F6**|Toggle statusbar visibility
-|**HELP**|Help screen
+|**ESC**|Leave character mode and go back to main mode
+|**FUNCT+6**|Toggle statusbar visibility
+|**FUNCT+8**|Help screen
 
 *Moving cursor*
 
 Press the **cursor keys** to move the cursor around the 8 by 8 grid.
 
-*Selecting the [screencode](https://sta.c64.org/cbm64scr.html) to plot*
+*Selecting the screencode to plot*
 
-The **+** or **-** key will increase resp. decrease the selected [screencode](https://sta.c64.org/cbm64scr.html) by one. Pressing A will toggle the character set to be used between Standard and Alternate.
+The **+** or **-** key will increase resp. decrease the selected screencode by one. Pressing A will toggle the character set to be used between Standard and Alternate.
 
-*Selecting the [screencode](https://sta.c64.org/cbm64scr.html) to plot from a favotite slot*
+*Selecting the screencode to plot from a favotite slot*
 
 In OSE 10 positions are available to store your most frequently used characters in. Pressing one of the **0-9** keys selects the favorite with the corresponding number.
 
-*Storing the present [screencode](https://sta.c64.org/cbm64scr.html) to a favorite slot*
+*Storing the present screencode to a favorite slot*
 
-Pressing **SHIFT** plus **1-9** stores the presently selected character to the corresponding favorite slot. As SHIFT+0 is the same as 0 on the Plus/4, press **\*** for favorite position 0.
+Pressing **SHIFT** plus **0-9** stores the presently selected character to the corresponding favorite slot.
 
 *Toggling bits in the grid*
 
@@ -380,17 +369,17 @@ Press **SPACE** to toggle the bit at the present cursor position. **DEL** clears
 
 *Undo and restore*
 
-**U** reverts the present character to the original values. Note that after changing to a different [screencode](https://sta.c64.org/cbm64scr.html) to edit, the previous [screencode](https://sta.c64.org/cbm64scr.html) can no longer be reverted.
+**U** reverts the present character to the original values. Note that after changing to a different screencode to edit, the previous screencode can no longer be reverted.
 
-**S** copies the present [screencode](https://sta.c64.org/cbm64scr.html) from the system font.
+**S** copies the present screencode from the system font.
 
 *Copy and paste*
 
-**C** copies the present [screencode](https://sta.c64.org/cbm64scr.html) to buffer memory to be pasted with pressing **V* at a different [screencode](https://sta.c64.org/cbm64scr.html) after selecting this other [screencode](https://sta.c64.org/cbm64scr.html).
+**C** copies the present screencode to buffer memory to be pasted with pressing **V** at a different screencode after selecting this other screencode.
 
-*Mirror, rotate and scroll*
+*Mirror and scroll*
 
-Press **X** or **Y** to mirror the grid on the X resp. Y axis. **O** rotates the grid clockwise. **L**, **R**, **U** and **D** scrolls the grid to the **L**eft, **R*ight**, **U**p or **D**own.
+Press **X** or **Y** to mirror the grid on the X resp. Y axis. **L**, **R**, **U** and **D** scrolls the grid to the **L**eft, **R**ight, **U**p or **D**own.
 
 *Hex input*
 
@@ -398,7 +387,7 @@ Press **H** to edit the full present row of the grid by entering the hex value o
 
 *Leave mode and help*
 
-Pressing **ESC** or **STOP** leaves the character mode and returns to main mode. **HELP** will show a help screen with all keyboard commands of the character mode.
+Pressing **ESC** leaves the character mode and returns to main mode. **FUNCT+8** will show a help screen with all keyboard commands of the character mode.
 
 ## Palette mode:
 ([Back to contents](#contents))
@@ -407,9 +396,9 @@ Pressing **P** in the main mode starts the Palette mode. In this mode a characte
 
 A window like this appears:
 
-![Palette mode screenshot](https://github.com/xahmol/tedScreenEditor/blob/main/screenshots/OSE%20Palette.png?raw=true)
+![Palette mode screenshot](https://github.com/xahmol/OricScreenEditor/blob/main/screenshots/OSE%20Palette.png?raw=true)
 
-The window shows the 10 favorite slots as first line, below that thecharacter set and below that the color palette.
+The window shows the 10 favorite slots as first line, below that the standard character set and below that the alternate character set.
 
 Keyboard commands in this mode:
 
@@ -418,10 +407,10 @@ Keyboard commands in this mode:
 |**Cursor keys**|Move cursor
 |**SPACE or ENTER**|Select character
 |**0-9**|Store character in corresponding favorite slot
-|**V**|Toggle between normal mode and visual PETSCII mode
-|**ESC** / **STOP**|Leave character mode and go back to main mode
-|**F6**|Toggle statusbar visibility
-|**HELP**|Help screen
+|**V**|Toggle between normal mode and visual charmap mode
+|**ESC** |Leave character mode and go back to main mode
+|**FUNCT+6**|Toggle statusbar visibility
+|**FUNCT+8**|Help screen
 
 *Moving cursor*
 
@@ -429,25 +418,25 @@ Press the **cursor keys** to move the cursor around the grid. You can move over 
 
 *Selecting character or color*
 
-Press **SPACE** or **ENTER** to select the hightlighted character or color as new character or color to plot with. This leaves the palette mode.
+Press **SPACE** or **ENTER** to select the highlighted character or color as new character or color to plot with. This leaves the palette mode.
 
 *Storing to a favorite slot*
 
 Pessing **0-9** stores the presently highlighted character to the corresponding favorite slot.
 
-*Toggle visual PETSCII mode*
+*Toggle visual charmap mode*
 
-Visual PETSCII mode is a mode in which the palette for the standard charset is mapped in such a way that PETSCII characters are ordered in a logical order for drawing. This mode makes only sense for standard charsets that left the PETSCII drawing characters unchanged.
+Visual charmap mode is a mode in which the palette for the alternate charset is mapped in such a way that characters are ordered in a logical order for drawing. This mode makes only sense for unchanged alternate charsets.
 
 This looks like this:
 
-![Visual PETSCII palette](https://raw.githubusercontent.com/xahmol/OricScreenEditor/main/screenshots/OSE%20Palette%20Visual.png)
+![Visual PETSCII palette](https://github.com/xahmol/OricScreenEditor/blob/main/screenshots/OSE%20Palette%20Visual.png?raw=true)
 
 Pressing **V** toggles between normal and visual mode.
 
 *Leave mode and help*
 
-Pressing **ESC** or **STOP** leaves the palette mode and returns to main mode. **HELP** will show a help screen with all keyboard commands of the character mode.
+Pressing **ESC** leaves the palette mode and returns to main mode. **FUNCT+8** will show a help screen with all keyboard commands of the character mode.
 
 ## Select mode:
 ([Back to contents](#contents))
@@ -456,7 +445,7 @@ Pressing **S** in the main mode starts the Select mode.
 
 If enabled, the statusbar shows this on entering this mode:
 
-![Status bar in Select mode](https://github.com/xahmol/tedScreenEditor/raw/main/screenshots/OSE%20statusbar%20Select.png)
+![Status bar in Select mode](https://github.com/xahmol/OricScreenEditor/blob/main/screenshots/OSE%20statusbar%20Select.png?raw=true)
 
 In this mode a selection can be made on which different operations can be performed as described below.
 
@@ -465,17 +454,18 @@ In this mode a selection can be made on which different operations can be perfor
 |**X**|Cut: Delete selection at old position and paste at new position
 |**C**|**C**opy: Copy selection at new position, leaving selection unchanged at old position
 |**D**|**D**elete selection (fill with spaces)
-|**A**|Paint with **A**ttribute: change attribute value of selection to present attribute value
-|**P**|**P**aint with color: change only the color value of selection
+|**I**|Paint with **I**nk attribute: plot ink modifier in presently selected color
+|**P**|Paint with **P**aper attribute: plot paper modifier in presently selected color
+|**M**|Paint with Character **M**odifier attribute: plot character modifier in presently selected A,D and B attributes.
 |**RETURN**|Accept selection / accept new position
-|**ESC** / **STOP**|Cancel and go back to main mode
+|**ESC** |Cancel and go back to main mode
 |**Cursor keys**|Expand/shrink in the selected direction / Move cursor to select destination position
-|**F6**|Toggle statusbar visibility
-|**HELP**|Help screen
+|**FUNCT+6**|Toggle statusbar visibility
+|**FUNCT+8**|Help screen
 
 *Making the selection*
 
-Ensure that the cursor is located at the desired upper left corner of the selection to be made before entering Select mode. On entering select mode, grow the selection by pressing **Cursor Right** to increase width and **Cursor Down** to increase height. **Cursor Left** and **Cursor Up** will shrink width resp. height. This is similar to the keys used in the [Line and box mode](#line-and-box-mode).
+Ensure that the cursor is located at a corner of the selection to be made before entering Select mode. On entering select mode, grow the selection by pressing the **Cursor keys** to increase or decrease width and height in the desired direction from the origin. This is similar to the keys used in the [Line and box mode](#line-and-box-mode).
 
 The selection will be visually shown with plotting in the present selected screencode and attributes. It should look like this:
 
@@ -485,7 +475,7 @@ Accept the selection by pressing **RETURN**, cancel the selection by pressing **
 
 *Choose action to perform*
 
-After accepting the selection, press **X**, **C**, **D**, **A** or **P** to choose an action, or press **ESC** or **STOP** to cancel.
+After accepting the selection, press **X**, **C**, **D**, **A** or **P** to choose an action, or press **ESC**  to cancel.
 Statusbar (if enabled) shows this as prompter:
 
 ![Statusbar Select Options](https://github.com/xahmol/OricScreenEditor/raw/main/screenshots/OSE%20statusbar%20Select%20choose%20option.png)
@@ -504,11 +494,11 @@ Pressing **D** will erase the present selection (fill the selected area with spa
 
 *Paint with attribute or only color*
 
-Pressing **A** will change the attribute values of all characters in the selected area to the present selected attribute value, so color, luminance and blink value. Pressing **P** will only change the color, but will leave the other attributes (blink and luminance) unchanged. Note that **P** is much slower than **A**.
+Pressing **I**, **P** or **M** will fill the area with resp. ink color, paper color or character set modifiers with the presently selected values. Makes most sense in selecting a vertical length of one character wide to change attributes for all lines right of that line.
 
 *Leaving mode and Help*
 
-Leave selection mode by pressing **ESC** or **STOP**. Pressing **HELP** at any time in this mode will provide a helpscreen with the key commands for this mode (not possible if the selection is grown but not yet accepted).
+Leave selection mode by pressing **ESC** . Pressing **FUNCT+8** at any time in this mode will provide a helpscreen with the key commands for this mode (not possible if the selection is grown but not yet accepted).
 
 ## Move mode:
 ([Back to contents](#contents))
@@ -521,102 +511,70 @@ It is also important to note that characters that 'fall off' of the screen are l
 
 Alternative to move mode is using [select mode](#select-mode) and use Cut to move a selection to a new position.
 
-Accept with **RETURN**, cancel with **ESC** or **STOP**. Both will leave this mode and return to main mode.
+Accept with **RETURN**, cancel with **ESC**. Both will leave this mode and return to main mode.
 
 |Key|Description
 |---|---|
 |**Cursor keys**|Move in the selected direction
 |**RETURN**|Accept moved position
-|**ESC** / **STOP**|Cancel and go back to main mode
-|**F6**|Toggle statusbar visibility
-|**HELP**|Help screen
+|**ESC**|Cancel and go back to main mode
+|**FUNCT+6**|Toggle statusbar visibility
+|**FUNCT+8**|Help screen
 
 ## Line and box mode:
 ([Back to contents](#contents))
 
 Pressing **L** in the main mode starts the Line and box mode. In this mode lines and boxes can be drawn, plotting with the present selected screencode and attribute value.
 
-Ensure that the cursor is located at the desired upper left corner of the line or box to be made before entering Line and box mode. Grow the line or box by pressing **Cursor Right** to increase width and **Cursor Down** to increase height. **Cursor Left** and **Cursor Up** will shrink width resp. height. Leaving with or height at one character draws a line, otherwise a box is drawn.
+Ensure that the cursor is located at a corner of the selection to be made before entering Select mode. On entering select mode, grow the selection by pressing the **Cursor keys** to increase or decrease width and height in the desired direction from the origin. Leaving with or height at one character draws a line, otherwise a box is drawn.
 
-Accept with **RETURN**, cancel with **ESC** or **STOP**. Both will leave this mode and return to main mode.
+Accept with **RETURN**, cancel with **ESC**. Both will leave this mode and return to main mode.
 
-**HELP** will show a help screen with all screen commands for this mode.
+**FUNCT+8** will show a help screen with all screen commands for this mode.
 
 |Key|Description
 |---|---|
 |**Cursor keys**|Expand/shrink in the selected direction
 |**RETURN**|Accept line or box
-|**ESC** / **STOP**|Cancel and go back to main mode
-|**F6**|Toggle statusbar visibility
-|**HELP**|Help screen
+|**ESC**|Cancel and go back to main mode
+|**FUNCT+6**|Toggle statusbar visibility
+|**FUNCT+8**|Help screen
 
 ## Write mode:
 ([Back to contents](#contents))
 
-Pressing **W** in the main mode starts the Write mode. In this mode text can be freely entered by using the full keyboard, making text input way easier than selecting the appropriate screencodes one by one. The full keyboard is supported, as long as the characters entered are printable (which means: can be transferred from the input PETSCII value to a [screencode](https://sta.c64.org/cbm64scr.html). To be able to enter the full range of characters, pressing **SHIFT** or **C=** with a supported key is possible.
+Pressing **W** in the main mode starts the Write mode. In this mode text can be freely entered by using the full keyboard, making text input way easier than selecting the appropriate screencodes one by one. The full keyboard is supported, as long as the characters entered are printable (screencodes higher than 32).
 
-Luminance can be increased and decreased by **F2** resp. **F5**.
+Colors and attribute can be plotted while in write mode by first modifying the attributes desired, then by plotting an attribute code:
+- Pressing **CTRL+Z** or **CTRL+X** decreases resp. increases selected ink color
+- Pressing ***CTRL+C** or **CTRL+V** decreases resp. increases selected paper color
+- Pressing **CTRL+B**, **CTRL+A** or **CTRL+D** toggles alternate charset, double resp. blink attribute
+- Pressing **CTRL+R** toggles reverse mode
+- Pressing **FUNCT+1** plots ink
+- Pressing **FUNCT+2** plots paper
+- Pressing **FUNCT+3** plots character modifier.
 
-Additionally, selecting colors and RVS On or Off is supported using the **CONTROL** and **C=** keys while pressing the 0 to 9 keys.
-
-Blink and Lowercae Charset attributes can be toggled by using resp. the **F1** and **F4** key.
-
-Undo and redo can be performed (if enabled and if 64 KiB Oric memory is present) with **F2** for Undo and **F4** for redo.
-
-Leave Write mode by pressing **ESC** or **STOP**. **HELP** will show a help screen with the key commands for this mode.
+Leave Write mode by pressing **ESC**. **FUNCT+8** will show a help screen with the key commands for this mode.
 
 |Key|Description
 |---|---|
 |**Cursor keys**|Move in the selecOric direction
 |**DEL**|Clear present cursor position (plot white space)
-|**F2**|Increase luminance
-|**F5**|Decrease luminance
-|**F1**|Toggle 'blink' attribute
-|**F4**|Toggle lower/uppercase
-|**C=** / **CONTROL** + **1-8**|Select color
-|**CONTROL** + **9 / 0**|RVS On / RVS Off (toggle [screencode](https://sta.c64.org/cbm64scr.html) + 128)
-|**ESC** / **STOP**|Go back to main mode
-|**F6**|Toggle statusbar visibility
-|**HELP**|Help screen
+|**CTRL+A**|Toggles alternate charset attribute
+|**CTRL+B**|Toggles blink attribute
+|**CTRL+D**|Toggles double attribute
+|**CTRL+R**|Toggles reverse
+|**CTRL+Z**|Decreases ink color
+|**CTRL+X**|increases ink color
+|**CTRL+C**|Decreases paper color
+|**CTRL+V**|increases paper color
+|**FUNCT+1**|Plots ink
+|**FUNCT+2**|Plots paper
+|**FUNCT+3**|Plots character modifier
+|**ESC** |Go back to main mode
+|**FUNCT+6**|Toggle statusbar visibility
+|**FUNCT+8**|Help screen
 |**Other keys**|Plot corresponding character (if printable)
-
-## Color write mode:
-([Back to contents](#contents))
-
-Pressing **C** in the main mode starts the Color write mode. In this mode you can conveniently edit colors in the screen by entering the [color value](#color-value-reference) of the desired color by pressing the key with the corresponding hex value of that color value (so **0-9** and **A-F**).
-Pressing **SHIFT+0-7** plots luminance with the corresponding value, **SHIFT+8** plots a blink attribute.
-
-Blink and lowercase attributes can be toggled by using resp. the **F1** or **F4** key.
-
-Leave Color write mode by pressing **ESC** or **STOP**. **HELP** will show a help screen with the key commands for this mode.
-
-|Key|Description
-|---|---|
-|**Cursor keys**|Move in the selected direction
-|**0-9** / **A-F**|Plot color with corresponding hex number
-|**SHIFT+0-7**|Plot luminance with corresponding value
-|**SHIFT+8**|Plot blink attribute
-|**F1**|Toggle 'blink' attribute
-|**F4**|Toggle lower/uppercase
-|**ESC** / **STOP**|Go back to main mode
-|**F6**|Toggle statusbar visibility
-|**HELP**|Help screen
-
-## OSE2PRG utility
-([Back to contents](#contents))
-
-OSE2PRG is a separate utility to create an executable program file for the Commodore Plus/4 of a OSE project. Only 40x25 screens are supported at the moment, but redefined character sets are supported.
-
-This is a seperate utility which can not be started from the OSE main program but has to be started seperately by loading the OSE2PRG file from disk with for example LOAD"OSE2PRG",U(device number) and then enter RUN.
-
-Running this program gives this interface:
-
-![OSE2PRG UI](https://github.com/xahmol/OricScreenEditor/blob/main/screenshots/OSE2PRG%20UI.png?raw=true)
-
-Follow the on screen instructions for selecting the input file and the output file name. Input file should be a OSE project file in 40x25 characters, with the associated screen and characterset files on the same disk/location.
-Enter the input file filename without the .proj at the end.
-
-The generated program can be executed by using a RUN"(target filename)",U(target device ID).
 
 ## Color value reference:
 ([Back to contents](#contents))
