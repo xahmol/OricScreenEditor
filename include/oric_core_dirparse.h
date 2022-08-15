@@ -1,0 +1,65 @@
+// ====================================================================================
+// oric_core.h
+//
+// Core Oric system routines
+//
+// =====================================================================================
+
+#ifndef _ORIC_CORE_H__
+#define _ORIC_CORE_H__
+
+// Defines for scroll directions
+#define SCROLL_LEFT             0x01
+#define SCROLL_RIGHT            0x02
+#define SCROLL_DOWN             0x04
+#define SCROLL_UP               0x08
+
+// Variables in core Functions
+extern unsigned char DOSERROR;
+extern unsigned char ORIC_DIRParse_Xpos;
+extern unsigned char ORIC_DIRParse_Ypos;
+extern unsigned char ORIC_DIRParse_Ymax;
+extern unsigned char ORIC_DIRParse_Xmax;
+extern unsigned char ORIC_addrh;
+extern unsigned char ORIC_addrl;
+extern unsigned char ORIC_desth;
+extern unsigned char ORIC_destl;
+extern unsigned char ORIC_strideh;
+extern unsigned char ORIC_stridel;
+extern unsigned char ORIC_value;
+extern unsigned char ORIC_tmp1;
+extern unsigned char ORIC_tmp2;
+extern unsigned char ORIC_tmp3;
+extern unsigned char ORIC_tmp4;
+
+// Import assembly core Functions
+void ORIC_DIRParse_start_core();
+void ORIC_DIRParse_end();
+void ORIC_HChar_core();
+void ORIC_VChar_core();
+void ORIC_FillArea_core();
+void ORIC_CopyViewPort_core();
+void ORIC_ScrollCopy_core();
+void ORIC_Scroll_right_core();
+void ORIC_Scroll_left_core();
+void ORIC_Scroll_down_core();
+void ORIC_Scroll_up_core();
+void ORIC_RestoreStandardCharset();
+void ORIC_RestoreAlternateCharset();
+
+// Function Prototypes
+void ORIC_DIRParse_start(unsigned char xpos, unsigned char ypos, unsigned char ymax, unsigned char xmax);
+void ORIC_HChar(unsigned char row, unsigned char col, unsigned char character, unsigned char length);
+void ORIC_VChar(unsigned char row, unsigned char col, unsigned char character, unsigned char length);
+void ORIC_FillArea(unsigned char row, unsigned char col, unsigned char character, unsigned char length, unsigned char height);
+void ORIC_Init(void);
+void ORIC_Exit(void);
+unsigned int ORIC_RowColToAddress(unsigned char row, unsigned char col);
+unsigned char ORIC_CharAttribute(unsigned char charset, unsigned char doublesize, unsigned char blink);
+void ORIC_CopyViewPort(unsigned int sourcebase, unsigned int sourcewidth, unsigned int sourcexoffset, unsigned int sourceyoffset, unsigned char xcoord, unsigned char ycoord, unsigned char viewwidth, unsigned char viewheight );
+void ORIC_ScrollCopy(unsigned int sourcebase, unsigned int sourcewidth, unsigned int sourcexoffset, unsigned int sourceyoffset, unsigned char xcoord, unsigned char ycoord, unsigned char viewwidth, unsigned char viewheight, unsigned char direction);
+void ORIC_ScrollMove(unsigned char xcoord, unsigned char ycoord, unsigned char viewwidth, unsigned char viewheight, unsigned char direction, unsigned char clear);
+void ORIC_ScreenmapFill(unsigned int sourcebase, unsigned int sourcewidth, unsigned int sourceheight, unsigned char ink, unsigned char paper, unsigned char character);
+
+
+#endif /* __ORIC_CORE_H__ */
