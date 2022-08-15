@@ -53,6 +53,7 @@ BUT WITHOUT ANY WARRANTY. USE THEM AT YOUR OWN RISK!
 #include "osdklib.h"
 #include "defines.h"
 #include "oric_core.h"
+#include "libbasic.h"
 
 // Overlay data
 unsigned int overlaydata[4];
@@ -660,21 +661,21 @@ unsigned char areyousure(char* message, unsigned char syscharset)
     return choice;
 }
 
-void fileerrormessage(unsigned char error, unsigned char syscharset)
-{
-    /* Show message for file error encountered */
-
-    windownew(5,8,6,35,syscharset);
-    cputsxy(7,9,"File error!");
-    if(error<255)
-    {
-        sprintf(buffer,"Error nr.: %2X",error);
-        cputsxy(7,11,buffer);
-    }
-    cputsxy(7,13,"Press key.");
-    cgetc();
-    windowrestore(syscharset);   
-}
+//void fileerrormessage(unsigned char error, unsigned char syscharset)
+//{
+//    /* Show message for file error encountered */
+//
+//    windownew(5,8,6,35,syscharset);
+//    cputsxy(7,9,"File error!");
+//    if(error<255)
+//    {
+//        sprintf(buffer,"Error nr.: %2X",error);
+//        cputsxy(7,11,buffer);
+//    }
+//    cputsxy(7,13,"Press key.");
+//    cgetc();
+//    windowrestore(syscharset);   
+//}
 
 void messagepopup(char* message, unsigned char syscharset)
 {
@@ -771,8 +772,8 @@ void helpscreen_load(unsigned char screennumber)
     // Function to show selected help screen
     // Input: screennumber: 1-Main mode, 2-Character editor, 3-SelectMoveLinebox, 4-Write/colorwrite mode
 
-    int rc;
-    int len = 0;
+    //int rc;
+    //int len = 0;
 
     // Load system charset if needed
     if(charsetchanged[0] == 1)
@@ -781,13 +782,14 @@ void helpscreen_load(unsigned char screennumber)
     }
 
     // Load selected help screen
-    sprintf(buffer,"osehs%u.bin",screennumber);
-    rc = loadfile(buffer,(void*)SCREENMEMORY,&len);
+    sprintf(buffer,"!LOAD\"OSEHS%u.BIN\",A#%4X",screennumber,SCREENMEMORY);
+    basic(buffer);
+    //rc = loadfile(buffer,(void*)SCREENMEMORY,&len);
 
-    if(!len)
-    {
-        messagepopup("Insert application disk.",0);
-    }
+    //if(!len)
+    //{
+    //    messagepopup("Insert application disk.",0);
+    //}
     
     cgetc();
 
@@ -1567,11 +1569,11 @@ void showchareditgrid(unsigned int screencode, unsigned char stdoralt)
         {
             if(char_byte & (1<<(5-x)))
             {
-                cputcxy(x+33,y+3,CH_INVSPACE);
+                cputcxy(x+33,y+3,CH_SPACE);
             }
             else
             {
-                cputcxy(x+33,y+3,CH_SPACE);
+                cputcxy(x+33,y+3,CH_INVSPACE);
             }
         }
     }
@@ -1607,7 +1609,7 @@ void chareditor()
     showchareditgrid(char_screencode, char_altorstd);
     do
     {
-        bitset = (char_present[ypos] & (1<<(5-xpos)))?1:0;
+        bitset = (char_present[ypos] & (1<<(5-xpos)))?0:1;
         cputcxy(xpos+33,ypos+3,'*'+bitset*128);
         if(showbar) { printstatusbar(); }
         key = cgetc();
@@ -1639,7 +1641,7 @@ void chareditor()
             if(key=='+' || key=='=')
             {
                 char_screencode++;
-                if(char_screencode>127 || (char_altorstd && char_screencode>11)) { char_screencode=32; }
+                if(char_screencode>127 || (char_altorstd && char_screencode>111)) { char_screencode=32; }
             }
             else
             {
@@ -2097,6 +2099,9 @@ int chooseidandfilename(char* headertext, unsigned char maxlen, unsigned char va
     // Input: Headertext to print, maximum length of filename input string
 
     int valid = 0;
+    unsigned char len = strlen(filename);
+
+    if(len>maxlen) { filename[maxlen]=0; }
 
     windownew(2,5,12,38,0);
     cputsxy(4,6,headertext);
@@ -2104,6 +2109,150 @@ int chooseidandfilename(char* headertext, unsigned char maxlen, unsigned char va
     cputsxy(4,8,"Choose filename:            ");
     valid = textInput(4,9,filename,maxlen,validation);
     return valid;
+}
+
+unsigned char filenamegrabber(unsigned char xpos, unsigned char ypos)
+{
+    unsigned int address = SCREENMEMORY+(ypos*40)+xpos;
+    unsigned char x;
+    unsigned char valid=0;
+
+    for(x=0;x<9;x++)
+    {
+        filename[x] = PEEK(address++);
+        if(filename[x]<33) { filename[x]=0; x=9; }
+    }
+    if(filename[8]) { filename[9]=0; }
+
+    x=strlen(filename);
+
+    if(x)
+    {
+        valid=1;
+        if(filename[x-2]=='P' && filename[x-1]=='J') { valid=2; }
+        if(filename[x-2]=='S' && filename[x-1]=='C') { valid=3; }
+        if(filename[x-2]=='C' && filename[x-1]=='S') { valid=4; }
+        if(filename[x-2]=='C' && filename[x-1]=='A') { valid=5; }
+    }
+
+    return valid;
+}
+
+void highlightfile(unsigned char xpos, unsigned char ypos, unsigned char type)
+{
+    unsigned char x;
+
+    for(x=0;x<9;x++)
+    {
+        if(filename[x]<33)
+        {
+            x=9;
+        }
+        else
+        {
+            cputcxy(xpos+x,ypos,filename[x]+128);
+        }
+    }
+
+    switch (type)
+    {
+    case 2:
+        cputsxy(15,5,"(Project)");
+        break;
+    
+    case 3:
+        cputsxy(15,5,"(Screen) ");
+        break;
+
+    case 4:
+        cputsxy(15,5,"(StdChar)");
+        break;
+
+    case 5:
+        cputsxy(15,5,"(AltChar)");
+        break;
+    
+    default:
+        cputsxy(15,5,"         ");
+        break;
+    }
+}
+
+int filepickerfromdir(char* headertext)
+{
+    unsigned char x=2;
+    unsigned char y=9;
+    unsigned char key,type,changed;
+
+    windowsave(0,40,0);
+    basic("CLS:PAPER7:INK0");
+    printf("\n\n%s\n\n",headertext);
+    printf("Choose file:\n");
+
+    basic("!DIR \"*.BIN\"");
+
+    if(!filenamegrabber(x,y))
+    {
+        cputsxy(2,5,"No valid files to load. Press key.");
+        cgetc();
+        return -1;
+    }
+
+    do
+    {
+        type=filenamegrabber(x,y);
+        highlightfile(x,y,type);
+        key=cgetc();
+        cputsxy(x,y,filename);
+        changed=0;
+        switch (key)
+        {
+        case CH_CURS_DOWN:
+            if(y<26) { y++; }
+            changed=1;
+            break;
+        
+        case CH_CURS_UP:
+            if(y>9) { y--; }
+            changed=1;
+            break;
+
+        case CH_CURS_RIGHT:
+        case CH_CURS_LEFT:
+            x=(x==2)?22:2;
+            changed=1;
+            break;
+        
+        default:
+            break;
+        }
+
+        while (changed)
+        {
+            if(filenamegrabber(x,y))
+            {
+                changed=0;
+            }
+            else
+            {
+                y=9;
+                x=(x==2)?22:2;
+            }
+        }
+    } while (key!=CH_ENTER && key!=CH_ESC);
+
+    ORIC_FillArea(5,2,CH_SPACE,38,20);
+
+    if(key==CH_ESC)
+    {
+        return -1;
+    }
+    else
+    {
+        gotoxy(2,5);
+        cprintf("File selected: %s.BIN",filename);
+        return type;
+    }
 }
 
 void loadscreenmap(unsigned char combined)
@@ -2114,11 +2263,12 @@ void loadscreenmap(unsigned char combined)
     unsigned int maxsize = MEMORYLIMIT - SCREENMAPBASE;
     char* ptrend;
     int escapeflag;
-    int rc;
-    int len = 0;
+    //int rc;
+    //int len = 0;
     int address = (combined)?CHARSET_STD:SCREENMAPBASE;
   
-    escapeflag = chooseidandfilename("Load screen",9,7);
+    escapeflag = filepickerfromdir("Load screen");
+    //escapeflag = chooseidandfilename("Load screen",9,3);
 
     if(escapeflag==-1) { windowrestore(0); return; }
 
@@ -2142,22 +2292,24 @@ void loadscreenmap(unsigned char combined)
     {
         windowrestore(0);
         windowrestore(0);
-        sprintf(buffer,"%s.*",filename);
-        rc=loadfile(buffer,(void*)address,&len);
+        sprintf(buffer,"!LOAD\"%s.BIN\",A#%4X",filename,address);
+        basic(buffer);
+        //sprintf(buffer,"%s.*",filename);
+        //rc=loadfile(buffer,(void*)address,&len);
 
-        if(len)
+        //if(len)
+        //{
+        screenwidth = newwidth;
+        screenheight = newheight;
+        if(combined)
         {
-            screenwidth = newwidth;
-            screenheight = newheight;
-            if(combined)
-            {
-                memcpy((void*)SCREENMAPBASE,(void*)SCREENMEMORY,1080);
-                memcpy((void*)CHARSET_SWAP,(void*)CHARSET_STD,768);
-                charsetchanged[0]=1;
-                charsetchanged[1]=1;
-                charset_swap(0);                
-            }
+            memcpy((void*)SCREENMAPBASE,(void*)SCREENMEMORY,1080);
+            memcpy((void*)CHARSET_SWAP,(void*)CHARSET_STD,768);
+            charsetchanged[0]=1;
+            charsetchanged[1]=1;
+            charset_swap(0);                
         }
+        //}
         ORIC_CopyViewPort(SCREENMAPBASE,screenwidth,xoffset,yoffset,0,0,40,27);
         windowsave(0,1,0);
         menuplacebar();
@@ -2169,7 +2321,7 @@ void savescreenmap(unsigned char combined)
 {
     // Function to save screenmap
     int escapeflag;
-    int rc;
+    //int rc;
     int len = screenwidth*screenheight;
     int address = (combined)?CHARSET_STD:SCREENMAPBASE;
 
@@ -2187,8 +2339,10 @@ void savescreenmap(unsigned char combined)
         len+=1664;
     }
 
-    sprintf(buffer,"%s.bin",filename);
-    rc = savefile(buffer,(void*)address,len);
+    sprintf(buffer,"SAVEO\"%s.BIN\",A#%4X,E#%4X",filename,address,address+len-1);
+    basic(buffer);
+    //sprintf(buffer,"%s.BIN",filename);
+    //rc = savefile(buffer,(void*)address,len);
 
     if(combined)
     {
@@ -2198,14 +2352,14 @@ void savescreenmap(unsigned char combined)
         if(showbar) { initstatusbar(); }
     }
     
-    if(rc) { fileerrormessage(rc,0); }
+    //if(rc) { fileerrormessage(rc,0); }
 }
 
 void saveproject()
 {
     // Function to save project (screen, charsets and metadata)
-    int rc;
-    int len = 0;
+    //int rc;
+    //int len = 0;
     char projbuffer[19];
     int escapeflag;
   
@@ -2235,53 +2389,67 @@ void saveproject()
     projbuffer[17] = xoffset;
     projbuffer[18] = yoffset;
 
-    sprintf(buffer,"%spj.bin",filename);
+    sprintf(buffer,"SAVEO\"%sPJ.BIN\",A#%4X,E#%4X",filename,projbuffer,projbuffer+18);
+    basic(buffer);
+    //sprintf(buffer,"%spj.BIN",filename);
+    //rc = savefile(buffer,(void*)projbuffer,19);
 
-    rc = savefile(buffer,(void*)projbuffer,19);
-
-    if(rc) { fileerrormessage(rc,0); }
+    //if(rc) { fileerrormessage(rc,0); }
 
     // Store screen data
-    sprintf(buffer,"%ssc.bin",filename);
-    rc = savefile(buffer,(void*)SCREENMAPBASE,screenwidth*screenheight);
-    if(rc) { fileerrormessage(rc,0); }
+    sprintf(buffer,"SAVEO\"%sSC.BIN\",A#%4X,E#%4X",filename,SCREENMAPBASE,SCREENMAPBASE+(screenwidth*screenheight)-1);
+    basic(buffer);
+    //sprintf(buffer,"%ssc.BIN",filename);
+    //rc = savefile(buffer,(void*)SCREENMAPBASE,screenwidth*screenheight);
+    //if(rc) { fileerrormessage(rc,0); }
 
     // Store standard charset
     if(charsetchanged[0]==1)
     {
-        sprintf(buffer,"%scs.bin",filename);
-        rc = savefile(buffer,(void*)CHARSET_SWAP,768);
-        if(rc) { fileerrormessage(rc,0); }
+        sprintf(buffer,"SAVEO\"%sCS.BIN\",A#%4X,E#%4X",filename,CHARSET_SWAP,CHARSET_SWAP+767);
+        basic(buffer);
+        //sprintf(buffer,"%scs.BIN",filename);
+        //rc = savefile(buffer,(void*)CHARSET_SWAP,768);
+        //if(rc) { fileerrormessage(rc,0); }
     }
 
     // Store alternate charset
     if(charsetchanged[1]==1)
     {
-        sprintf(buffer,"%sca.bin",filename);
-        rc = savefile(buffer,(void*)CHARSET_ALT,640);
-        if(rc) { fileerrormessage(rc,0); }
+        sprintf(buffer,"SAVEO\"%sCA.BIN\",A#%4X,E#%4X",filename,CHARSET_ALT,CHARSET_ALT+639);
+        basic(buffer);
+        //sprintf(buffer,"%sca.BIN",filename);
+        //rc = savefile(buffer,(void*)CHARSET_ALT,640);
+        //if(rc) { fileerrormessage(rc,0); }
     }  
 }
 
 void loadproject()
 {
     // Function to load project (screen, charsets and metadata)
-    int rc;
-    int len = 0;
+    //int rc;
+    //int len = 0;
     unsigned char projbuffer[19];
     int escapeflag;
   
-    escapeflag = chooseidandfilename("Load project",7,7);
+    escapeflag = filepickerfromdir("Load project");
 
     windowrestore(0);
 
     if(escapeflag==-1) { return; }
 
-    // Load project variables
-    sprintf(buffer,"%spj.bin",filename);
-    rc = loadfile(buffer,(void*)projbuffer,&len);
+    if(escapeflag!=2) { messagepopup("No project file.",0); return; }
 
-    if(!len) { return; }
+    escapeflag = strlen(filename);
+    filename[escapeflag-2]=0;
+
+    // Load project variables
+    sprintf(buffer,"!LOAD\"%sPJ.BIN\",A#%4X",filename,projbuffer);
+    basic(buffer);
+    //sprintf(buffer,"%spj.BIN",filename);
+    //rc = loadfile(buffer,(void*)projbuffer,&len);
+
+    //if(!len) { return; }
 
     charsetchanged[0]       = projbuffer[ 0];
     charsetchanged[1]       = projbuffer[ 1];
@@ -2302,31 +2470,37 @@ void loadproject()
     yoffset                 = projbuffer[18];
 
     // Load screen
-    sprintf(buffer,"%ssc.bin",filename);
-    rc=loadfile(buffer,(void*)SCREENMAPBASE,&len);
-    if(len)
-    {
-        windowrestore(0);
-        ORIC_CopyViewPort(SCREENMAPBASE,screenwidth,xoffset,yoffset,0,0,40,27);
-        windowsave(0,1,0);
-        menuplacebar();
-        if(showbar) { initstatusbar(); }
-    }
+    sprintf(buffer,"!LOAD\"%sSC.BIN\",A#%4X",filename,SCREENMAPBASE);
+    basic(buffer);
+    //sprintf(buffer,"%ssc.BIN",filename);
+    //rc=loadfile(buffer,(void*)SCREENMAPBASE,&len);
+    //if(len)
+    //{
+    windowrestore(0);
+    ORIC_CopyViewPort(SCREENMAPBASE,screenwidth,xoffset,yoffset,0,0,40,27);
+    windowsave(0,1,0);
+    menuplacebar();
+    if(showbar) { initstatusbar(); }
+    //}
 
     // Load standard charset
     if(charsetchanged[0]==1)
     {
-        sprintf(buffer,"%scs.bin",filename);
-        rc=loadfile(buffer,(void*)CHARSET_SWAP,&len);
-        if(!len) { charsetchanged[0]=0; }
+        sprintf(buffer,"!LOAD\"%sCS.BIN\",A#%4X",filename,CHARSET_SWAP);
+        basic(buffer);
+        //sprintf(buffer,"%scs.BIN",filename);
+        //rc=loadfile(buffer,(void*)CHARSET_SWAP,&len);
+        //if(!len) { charsetchanged[0]=0; }
     }
 
     // Load alternate charset
     if(charsetchanged[1]==1)
     {
-        sprintf(buffer,"%sca.bin",filename);
-        rc=loadfile(buffer,(void*)CHARSET_ALT,&len);
-        if(!len) { charsetchanged[1]=0; }
+        sprintf(buffer,"!LOAD\"%sCA.BIN\",A#%4X",filename,CHARSET_ALT);
+        basic(buffer);
+        //sprintf(buffer,"%sca.BIN",filename);
+        //rc=loadfile(buffer,(void*)CHARSET_ALT,&len);
+        //if(!len) { charsetchanged[1]=0; }
     }
 }
 
@@ -2337,10 +2511,10 @@ void loadcharset(unsigned char stdoralt)
 
     unsigned int charsetaddress;
     int escapeflag;
-    int rc;
-    int len = 0;
+    //int rc;
+    //int len = 0;
   
-    escapeflag = chooseidandfilename("Load character set",9,7);
+    escapeflag = filepickerfromdir("Load character set");
 
     windowrestore(0);
 
@@ -2350,23 +2524,25 @@ void loadcharset(unsigned char stdoralt)
     if(stdoralt==1) { charsetaddress = CHARSET_ALT; }
     if(stdoralt==2) { charsetaddress = CHARSET_STD; }
 
-    sprintf(buffer,"%s.*",filename);
-    rc = loadfile(buffer,(void*)charsetaddress,&len);
+    sprintf(buffer,"!LOAD\"%s.BIN\",A#%4X",filename,charsetaddress);
+    basic(buffer);
+    //sprintf(buffer,"%s.*",filename);
+    //rc = loadfile(buffer,(void*)charsetaddress,&len);
 
-    if(len)
+    //if(len)
+    //{
+    if(stdoralt<2)
     {
-        if(stdoralt<2)
-        {
-            charsetchanged[stdoralt]=1;
-        }
-        else
-        {
-            charsetchanged[0]=1;
-            charsetchanged[1]=1;
-            memcpy((void*)CHARSET_SWAP,(void*)CHARSET_STD,768);
-            charset_swap(0);
-        }
+        charsetchanged[stdoralt]=1;
     }
+    else
+    {
+        charsetchanged[0]=1;
+        charsetchanged[1]=1;
+        memcpy((void*)CHARSET_SWAP,(void*)CHARSET_STD,768);
+        charset_swap(0);
+    }
+    //}
 }
 
 void savecharset(unsigned char stdoralt)
@@ -2376,7 +2552,7 @@ void savecharset(unsigned char stdoralt)
 
     unsigned int charsetaddress;
     int escapeflag;
-    int rc;
+    //int rc;
     int len;
   
     escapeflag = chooseidandfilename("Save character set",9,3);
@@ -2389,9 +2565,11 @@ void savecharset(unsigned char stdoralt)
     if(stdoralt==1) { charsetaddress = CHARSET_ALT; len=640;}
     if(stdoralt==2) { charsetaddress = CHARSET_STD; charset_swap(1); len=1664;}
 
-    sprintf(buffer,"%s.bin",filename);
-    rc = savefile(buffer,(void*)charsetaddress,len);
-    if(rc) { fileerrormessage(rc,0); }
+    sprintf(buffer,"SAVEO\"%s.BIN\",A#%4X,E#%4X",filename,charsetaddress,charsetaddress+len-1);
+    basic(buffer);
+    //sprintf(buffer,"%s.BIN",filename);
+    //rc = savefile(buffer,(void*)charsetaddress,len);
+    //if(rc) { fileerrormessage(rc,0); }
     if(stdoralt==2) { charset_swap(0);}
 }
 
@@ -2498,8 +2676,8 @@ void main()
     // Main application initialization, loop and exit
     
     unsigned char key,grab;
-    int rc;
-    int len = 0;
+    //int rc;
+    //int len = 0;
 
     // Reset startvalues global variables
     charsetchanged[0] = 0;
@@ -2534,7 +2712,9 @@ void main()
     ORIC_RestoreAlternateCharset();
 
     // Load and show title screen
-    rc = loadfile("osetsc.bin",(void*)SCREENMEMORY,&len);
+    sprintf(buffer,"!LOAD\"OSETSC.BIN\",A#%4X",SCREENMEMORY);
+    basic(buffer);
+    //rc = loadfile("osetsc.BIN",(void*)SCREENMEMORY,&len);
 
     // Clear screen map in bank 1 with spaces in text color white
     ORIC_ScreenmapFill(SCREENMAPBASE,screenwidth,screenheight,A_FWWHITE,A_FWBLACK,CH_SPACE);

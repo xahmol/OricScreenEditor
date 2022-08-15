@@ -8,34 +8,6 @@
 #ifndef _ORIC_CORE_H__
 #define _ORIC_CORE_H__
 
-/* ================================================================== *
- * libsedoric code                                                    *
- * ================================================================== */
-/*               _
- **  ___ ___ _ _|_|___ ___
- ** |  _| .'|_'_| |_ -|_ -|
- ** |_| |__,|_,_|_|___|___|
- **         raxiss (c) 2021
- **
- ** GNU General Public License v3.0
- ** See https://github.com/iss000/oricOpenLibrary/blob/main/LICENSE
- **
- */
-
-extern const char* sed_fname;
-extern void* sed_begin;
-extern void* sed_end;
-extern unsigned int sed_size;
-extern int sed_err;
-
-extern void sed_savefile(void);
-extern void sed_loadfile(void);
-
-int savefile(const char* fname, void* buf, int len);
-int loadfile(const char* fname, void* buf, int* len);
-
-// Own routines
-
 // Defines for scroll directions
 #define SCROLL_LEFT             0x01
 #define SCROLL_RIGHT            0x02
@@ -43,6 +15,7 @@ int loadfile(const char* fname, void* buf, int* len);
 #define SCROLL_UP               0x08
 
 // Variables in core Functions
+extern unsigned char DOSERROR;
 extern unsigned char ORIC_addrh;
 extern unsigned char ORIC_addrl;
 extern unsigned char ORIC_desth;

@@ -3,44 +3,14 @@
 ; Core assembly routines for oric_core.c
 ;
 ; Credits for code and inspiration:
-;
-; Sedoric disk operations routines:
-;-  lib-sedoric from oricOpenLibrary
-;    https://github.com/iss000/oricOpenLibrary/blob/main/lib-sedoric/libsedoric.s
-;   )              _
-;   )  ___ ___ _ _|_|___ ___
-;   ) |  _| .'|_'_| |_ -|_ -|
-;   ) |_| |__,|_,_|_|___|___|
-;   )         raxiss (c) 2021
-;   )
-;   ) GNU General Public License v3.0
-;   ) See https://github.com/iss000/oricOpenLibrary/blob/main/LICENSE
-;   )
-;
 ; - 6502.org: Practical Memory Move Routines
 ;   http://6502.org/source/general/memory_move.html
 ;
 ; =====================================================================================
 
-; ======================================================================
-; libsedoric exports
-; ======================================================================
+; Exports
 
-; _sed_fname  = Pointer to filename
-; _sed_begin  = Start address
-; _sed_end    = End address
-; _sed_size   = Size (not used)
-
-    .export     _sed_fname
-    .export     _sed_begin
-    .export     _sed_end
-    .export     _sed_size
-    .export     _sed_err
-    .export     _sed_savefile
-    .export     _sed_loadfile
-
-; Own routines exports
-
+	.export		_DOSERROR
 	.export		_ORIC_HChar_core
 	.export		_ORIC_VChar_core
 	.export		_ORIC_FillArea_core
@@ -64,23 +34,15 @@
 	.export		_ORIC_tmp4
 
 ; ======================================================================
-; libsedoric defines
+; Defines of system addresses
 ; ======================================================================
 
-; toggle rom on/off
-_dosrom             = $04f2
-
-; dos flag
-_dosflag            = $04fc
-
-; dos error
-_doserr             = $04fd
-
-; ======================================================================
-; Other defines
-; ======================================================================
-
-FDC_BUFFER          = $0314
+DOSROM				=	$04F2			; Call to function to disable/enable SEDORIC RAM
+_DOSERROR			=	$04FD			; Disk error address
+SED_PRINTCHAR		=	$D20F			; SEDORIC print character patch address
+SED_XROM			=	$D5D8			; SEDORIC default jump address before patch
+ROM_ALTCHARS		=	$F816			; Kernal call to ROM generate alt chars
+ROM_COPYROUTINE		=	$F982			; Kernal call to ROM copy routine		
 
 ; ======================================================================
 ; Zero page reservations
@@ -100,22 +62,7 @@ ZP4:
 .segment	"CODE"
 
 ; ======================================================================
-; libsedoric data
-; ======================================================================
-
-_sed_fname:
-    .byte 0,0
-_sed_begin:
-    .byte 0,0
-_sed_end:
-    .byte 0,0
-_sed_size:
-    .byte 0,0
-_sed_err:
-    .byte 0,0
-
-; ======================================================================
-; Own routines data
+; Data
 ; ======================================================================
 
 _ORIC_addrh:
@@ -140,144 +87,6 @@ _ORIC_tmp3:
 	.res	1
 _ORIC_tmp4:
 	.res	1
-
-; ======================================================================
-; libsedoric code
-; ======================================================================
-
-; ======================================
-; bool sed_savefile(const char* fname, void* buf, int len);
-; ======================================
-_sed_savefile:
-; --------------------------------------
-    tya
-    pha
-    jsr sed_szp
-    lda _sed_fname
-    sta $e9 ; Filename lo
-    lda _sed_fname+1
-    sta $ea ; Filename hi
-    jsr _dosrom  ; enable/disable OverlayRAM
-    ; $0B FTYPE, file type : OPEN "R" (#00) ou "S" (#80) ou "D" (#01)
-    lda #1
-    sta $0b
-    ; enable errors
-    lda #$00
-    sta $c018
-    ; verify filename and copy it to BUFNOM
-    clc
-    lda #$00
-    jsr $d454
-    ; Setup Areas
-    lda _sed_begin
-    sta $c052 ; Start Address Lo
-    lda _sed_begin+1
-    sta $c053 ; Start Address Hi
-    lda _sed_end
-    sta $c054   ; End Address Lo
-    lda _sed_end+1
-    sta $c055   ; End Address Hi
-    lda _sed_begin
-    sta $c056   ; Execution Address Lo
-    lda _sed_begin+1
-    sta $c057   ; Execution Address Hi
-    ; VSALO0: code pour SAve/LOad b6=1 si ",V" b7=1 si ",N"
-    lda #$00    ; #$00 - SAVEO, #$C0 - SAVEU
-    sta $c04d
-    ; VSALO1: code pour SAve/LOad b6=1 si ",A" b7=1 si ",J"
-    lda #$40    ; 0 here means no params
-    sta $c04e
-    lda #$40    ; file type - data and no auto
-    sta $c051
-    jsr $de0b   ; set LGSAL0 and call XSAVEB
-    jmp sed_exit
-
-; ======================================
-; bool sed_loadfile(const char* fname, void* buf, int* len);
-; ======================================
-_sed_loadfile:
-; --------------------------------------
-    tya
-    pha
-    jsr   sed_szp
-    lda   _sed_fname
-    sta   $e9 ; Filename lo
-    lda   _sed_fname+1
-    sta   $ea ; Filename hi
-    jsr   _dosrom  ; enable/disable OverlayRAM
-    ; $0B FTYPE, file type : OPEN "R" (#00) ou "S" (#80) ou "D" (#01)
-    lda   #1
-    sta   $0b
-    ; enable errors
-    lda   #$00
-    sta   $c018
-    clc
-    lda   #$00
-    ; verify filename and copy it to BUFNOM
-    jsr   $d454
-    ; Setup Areas
-    lda   _sed_begin
-    sta   $c052 ; Start Address Lo
-    lda   _sed_begin+1
-    sta   $c053 ; Start Address Hi
-    lda   #<$4000
-    sta   $c04d
-    lda   #>$4000
-    sta   $c04e
-    jsr   $e0e5 ; XLOADA
-    ; Get Areas
-    lda   $c052
-    sta   _sed_begin ; Start Address Lo
-    lda   $c053
-    sta   _sed_begin+1 ; Start Address Hi
-    clc
-    lda   $c04f
-    sta   _sed_size
-    adc   _sed_begin
-    sta   _sed_end ; End Address Lo
-    lda   $c050
-    sta   _sed_size+1
-    adc   _sed_begin+1
-    sta   _sed_end+1 ; End Address Lo
-
-; ======================================
-sed_exit:
-   jsr   _dosrom ; disable Overlay RAM
-; --------------------------------------
-sed_rzp:
-   ldx   #00
-sed_rzp_lp:
-   lda   savebuf_zp,x
-   sta   $00,x
-   dex
-   bne   sed_rzp_lp
-; --------------------------------------
-   lda   _doserr
-   sta   _sed_err
-   lda   _doserr+1
-   sta   _sed_err+1
-   pla
-   tay
-   rts
-
-; ======================================
-sed_szp:
-    ldx   #00
-sed_szp_lp:
-    lda   $00,x
-    sta   savebuf_zp,x
-    dex
-    bne   sed_szp_lp
-    rts
-
-; ======================================
-; to save some memry save buffer can
-; be placed at any unused memory location
-; for example:
-; savebuf_zp  = $b400
-; instead of:
-savebuf_zp:
-    .res 256
 
 ; Screen and scrolling core routines
 
@@ -653,7 +462,7 @@ _ORIC_RestoreStandardCharset:
 ; ------------------------------------------------------------------------------------------
 
     ldx #$05                            ; Set up right value for lookup table
-    jsr $F982                           ; Jump to ROM copy routine
+    jsr ROM_COPYROUTINE                 ; Jump to ROM copy routine
     rts
 
 ; ------------------------------------------------------------------------------------------
@@ -664,6 +473,5 @@ _ORIC_RestoreAlternateCharset:
 ; https://library.defence-force.org/books/content/oric_advanced_user_guide.pdf
 ; ------------------------------------------------------------------------------------------
 
-    jsr $F816                           ; Jump to ROM routine
+    jsr ROM_ALTCHARS                    ; Jump to ROM routine
     rts
-

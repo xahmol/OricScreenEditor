@@ -34,28 +34,6 @@
 #include "defines.h"
 #include "oric_core.h"
 
-// Sedoric lib routines
-
-int savefile(const char* fname, void* buf, int len)
-{
-	len--;
-    sed_fname = fname;
-    sed_begin = buf;
-    sed_end = (char*)sed_begin+len;
-    sed_size = len;
-    sed_savefile();
-    return sed_err;
-}
-
-int loadfile(const char* fname, void* buf, int* len)
-{
-    sed_fname = fname;
-    sed_begin = buf;
-    sed_loadfile();
-    *len = sed_size;
-    return sed_err;
-}
-
 // Generic screen and scroll routines
 
 void ORIC_HChar(unsigned char row, unsigned char col, unsigned char character, unsigned char length)

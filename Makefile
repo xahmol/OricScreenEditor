@@ -49,7 +49,7 @@ EMUARG                  += --turbotape on
 
 ## C Sources and library objects to use
 SOURCES = src/main.c src/oric_core.c
-LIBOBJECTS = src/oric_core_assembly.s
+LIBOBJECTS = src/oric_core_assembly.s src/libbasic.s
 
 ## Compiler and linker flags
 CC65_TARGET = atmos
@@ -78,7 +78,7 @@ $(PROGRAM): $(SOURCES:.c=.o)
 # Build disk
 $(DISK_DSK): $(PROGRAM) $(TESTPROG_BIN)
 	$(OSDK)header $(PROGRAM) BUILD/$(PROJECT).tap 0x0501
-	$(OSDK)tap2dsk -iCLS:$(PROJECT) -c20:3 -n$(PROJECT) BUILD/$(PROJECT).tap OSEHS1.tap OSEHS2.tap OSEHS3.tap OSEHS4.tap OSETSC.tap $(DISK_DSK)
+	$(OSDK)tap2dsk -iCLS:$(PROJECT) -c20:3 -n$(PROJECT) BUILD/$(PROJECT).tap OSEHS1.tap OSEHS2.tap OSEHS3.tap OSEHS4.tap OSETSC.tap PETSCIIPJ.tap PETSCIISC.tap PETSCIICS.tap PETSCIICA.tap $(DISK_DSK)
 	$(OSDK)old2mfm $(DISK_DSK)
 	cd $(HXCFE); ./hxcfe -finput:"$(mkfile_path)/$(DISK_DSK)" -foutput:"$(mkfile_path)/$(DISK_HFE)" -conv:HXC_HFE
 

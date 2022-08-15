@@ -13,7 +13,7 @@ Makefile:29: pipe: No error
 # There is NO WARRANTY, to the extent permitted by law.
  
 
-# Make data base, printed on Wed Jun 15 14:50:01 2022
+# Make data base, printed on Sun Aug 14 17:25:34 2022
 
 # Variables
 
@@ -27,8 +27,6 @@ LC_ALL = C
 USERPROFILE = C:\Users\xande
 # environment
 LOCALAPPDATA = C:\Users\xande\AppData\Local
-# environment
-VSCODE_IPC_HOOK_EXTHOST = \\.\pipe\vscode-ipc-6f5063b0-5250-4028-a7c4-fdbe53626bc6-sock
 # environment
 VSCODE_CWD = C:\Program Files\Microsoft VS Code
 # environment
@@ -48,7 +46,7 @@ HXCFE := /home/xahmol/hxcfloppyemu-cod/HxCFloppyEmulator/HxCFloppyEmulator_cmdli
 # environment
 DOKANLIBRARY1_LIBRARYPATH_X64 = C:\Program Files\Dokan\Dokan Library-1.4.1\lib\
 # environment
-CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_31712_QELGXPHHEFDNPUJC
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_30316_MHTQGSHEOZBTHNIN
 # environment
 VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # default
@@ -61,12 +59,10 @@ EMU := ./oricutron
 OSDK := /home/xahmol/OSDK-build/pc/tools/osdk/main/osdk-linux/bin/
 # automatic
 ^D = $(patsubst %/,%,$(patsubst %\,%,$(dir $^)))
-# environment
-VSCODE_LOG_STACK = false
 # automatic
 %F = $(notdir $%)
 # environment
-VSCODE_CODE_CACHE_PATH = C:\Users\xande\AppData\Roaming\Code\CachedData\4af164ea3a06f701fe3e89a2bcbb421d2026b68f
+VSCODE_CODE_CACHE_PATH = C:\Users\xande\AppData\Roaming\Code\CachedData\da76f93349a72022ca4670c1b84860304616aaa2
 # makefile (from 'Makefile', line 48)
 EMUARG := -ma --serial none --vsynchack off --turbotape on
 # environment
@@ -90,8 +86,6 @@ ONEDRIVE = C:\Users\xande\OneDrive
 # makefile
 CURDIR := d:/Git/OricScreenEditor
 # environment
-VSCODE_PIPE_LOGGING = true
-# environment
 DOKANLIBRARY1_LIBRARYPATH_X86 = C:\Program Files\Dokan\Dokan Library-1.4.1\x86\lib\
 # environment
 APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
@@ -114,9 +108,7 @@ MAKEFILE_LIST := Makefile src/main.d src/oric_core.d
 # automatic
 @F = $(notdir $@)
 # environment
-VSCODE_VERBOSE_LOGGING = true
-# environment
-VSCODE_PID = 31712
+VSCODE_PID = 30316
 # automatic
 ?D = $(patsubst %/,%,$(patsubst %\,%,$(dir $?)))
 # environment
@@ -128,7 +120,8 @@ PROJECT_DIR :=
 # automatic
 <D = $(patsubst %/,%,$(patsubst %\,%,$(dir $<)))
 # environment
-VSCODE_NLS_CONFIG = {"locale":"nl","availableLanguages":{},"_languagePackSupport":true}
+VSCODE_NLS_CONFIG = {"locale":"nl","ava 
+ilableLanguages":{},"_languagePackSupport":true}
 # environment
 ONEDRIVECONSUMER = C:\Users\xande\OneDrive
 # default
@@ -154,8 +147,7 @@ MAKELEVEL := 0
 # default
 MAKE = $(MAKE_COMMAND)
 # environment
-PATH = C:\Program Files\Common Files\Oracle\Java\javapath;C:\Python310\Scripts\;C:\Python310\;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Python39\Scripts\;C:\Python39\;C:\windows\system32;C:\windows;C:\windows\System32\Wbem;C:\windows\System32\WindowsPowerShell\v1.0\;C:\windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files\Calibre2\;C:\Program Files\Microsoft VS Code\bin;C:\ProgramData\chocolatey\bin;C:\Program Files\PuTTY\;C:\Program Files\LLVM\bin;C:\Program Files\Amazon\AWSCLIV2\;C:\Program Files (x86)\HP\IdrsOCR_15.2.10.1114\;C:\Program Files\dotnet\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files (x86)\dotnet\;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin;C:\Program Files\nodejs\;C:\Users\xande\AppData\Local\Microsoft\WindowsApps;C:\Users\xande\AppData\Local\GitHubDesktop\bin;C:\Users\xande\AppData\Local\Programs\Git\cmd;D:\DevTools\apache-maven-3.8.4\bin;C:\Users\xande\Ap 
-pData\Roaming\npm
+PATH = C:\Program Files\Common Files\Oracle\Java\javapath;C:\Python310\Scripts\;C:\Python310\;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Python39\Scripts\;C:\Python39\;C:\windows\system32;C:\windows;C:\windows\System32\Wbem;C:\windows\System32\WindowsPowerShell\v1.0\;C:\windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files\Calibre2\;C:\Program Files\Microsoft VS Code\bin;C:\ProgramData\chocolatey\bin;C:\Program Files\PuTTY\;C:\Program Files\LLVM\bin;C:\Program Files\Amazon\AWSCLIV2\;C:\Program Files (x86)\HP\IdrsOCR_15.2.10.1114\;C:\Program Files\dotnet\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files (x86)\dotnet\;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin;C:\Program Files\nodejs\;C:\Users\xande\AppData\Local\Microsoft\WindowsApps;C:\Users\xande\AppData\Local\GitHubDesktop\bin;C:\Users\xande\AppData\Local\Programs\Git\cmd;D:\DevTools\apache-maven-3.8.4\bin;C:\Users\xande\AppData\Roaming\npm
 # environment
 COMPUTERNAME = XANDERPC2021
 # makefile (from 'Makefile', line 23)
@@ -167,11 +159,9 @@ MAKEFILES :=
 # environment
 PROMPT = $P$G
 # makefile (from 'Makefile', line 52)
-LIBOBJECTS = src/oric_core_assembly.s
+LIBOBJECTS = src/oric_core_assembly.s src/libbasic.s
 # environment
 LOGONSERVER = \\XANDERPC2021
-# environment
-VSCODE_LOG_NATIVE = false
 # environment
 USERNAME = xande
 # makefile (from 'Makefile', line 41)
@@ -237,7 +227,7 @@ ELECTRON_RUN_AS_NODE = 1
 # environment
 TEMP = C:\Users\xande\AppData\Local\Temp
 # environment
-VSCODE_IPC_HOOK = \\.\pipe\c7276ac39fbbf2dfb6220de2f50e8e58-1.68.0-main-sock
+VSCODE_IPC_HOOK = \\.\pipe\c7276ac39fbbf2dfb6220de2f50e8e58-1.70.0-main-sock
 # default
 .RECIPEPREFIX := 
 # automatic
@@ -261,7 +251,7 @@ SOURCES = src/main.c src/oric_core.c
 # environment
 PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 165 Stepping 5, GenuineIntel
 # variable set hash-table stats:
-# Load=121/1024=12%, Rehash=0, Collisions=13/184=7%
+# Load=116/1024=11%, Rehash=0, Collisions=12/179=7%
 
 # Pattern-specific Variable Values
 
@@ -269,10 +259,10 @@ PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 165 Stepping 5, GenuineIntel
 
 # Directories
 
-# src (key d:/Git/OricScreenEditor/src, mtime 1655284166): No files, no impossibilities so far.
-# . (key d:/Git/OricScreenEditor, mtime 1655284185): 21 files, no impossibilities.
+# src (key d:/Git/OricScreenEditor/src, mtime 1660490643): No files, no impossibilities so far.
+# . (key d:/Git/OricScreenEditor, mtime 1660490580): 25 files, no impossibilities.
 
-# 21 files, no impossibilities in 2 directories.
+# 25 files, no impossibilities in 2 directories.
 
 # Implicit Rules
 
@@ -285,7 +275,7 @@ PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 165 Stepping 5, GenuineIntel
 
 BUILD/OSE.bin: src/main.o src/oric_core.o
 #  Implicit rule search has not been done.
-#  Last modified 2022-06-15 11:09:26
+#  Last modified 2022-08-14 17:24:03
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'Makefile', line 76):
@@ -294,13 +284,14 @@ BUILD/OSE.bin: src/main.o src/oric_core.o
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-15 11:09:18
+#  Last modified 2022-08-14 17:23:45
 #  File has been updated.
 #  Successfully updated.
 
 src/oric_core.c:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-15 10:38:18
+#  L 
+ast modified 2022-08-14 16:19:25
 #  File has been updated.
 #  Successfully updated.
 
@@ -309,8 +300,7 @@ clean:
 #  Implicit rule search has not been done.
 #  File does not exist.
 #  File has not been updated.
-#  recipe to execute (from 'Ma 
-kefile', line 87):
+#  recipe to execute (from 'Makefile', line 87):
 	$(RM) $(SOURCES:.c=.o) $(SOURCES:.c=.d) $(PROGRAM) $(PROGRAM).map $(PROGRAM).brk $(PROGRAM).sym
 	cd BUILD; $(RM) *.*
 
@@ -323,22 +313,28 @@ include/osdklib.h:
 src/oric_core.o: src/oric_core.c src/oric_core.c include/defines.h include/osdklib.h include/oric_core.h
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'src/oric_core'
-#  Last modified 2022-06-15 11:09:26
+#  Last modified 2022-08-14 17:24:03
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'Makefile', line 72):
 	$(CC) -c $(CFLAGS) -o $@ $<
 
-src/main.c:
+include/libbasic.h:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-15 10:38:35
+#  Last modified 2022-06-27 17:34:10
 #  File has been updated.
 #  Successfully updated.
 
-src/main.o: src/main.c src/main.c include/defines.h include/osdklib.h include/oric_core.h
+src/main.c:
+#  Implicit rule search has been done.
+#  Last modified 2022-08-14 17:01:06
+#  File has been updated.
+#  Successfully updated.
+
+src/main.o: src/main.c src/main.c include/defines.h include/osdklib.h include/oric_core.h include/libbasic.h
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'src/main'
-#  Last modified 2022-06-15 11:09:26
+#  Last modified 2022-08-14 17:24:03
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'Makefile', line 72):
@@ -374,12 +370,12 @@ run-debug:
 
 BUILD/OSE.dsk: BUILD/OSE.bin
 #  Implicit rule search has not been done.
-#  Last modified 2022-06-15 11:09:26
+#  Last modified 2022-08-14 17:24:03
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'Makefile', line 80):
 	$(OSDK)header $(PROGRAM) BUILD/$(PROJECT).tap 0x0501
-	$(OSDK)tap2dsk -iCLS:$(PROJECT) -c20:3 -n$(PROJECT) BUILD/$(PROJECT).tap OSEHS1.tap OSEHS2.tap OSEHS3.tap OSEHS4.tap OSETSC.tap $(DISK_DSK)
+	$(OSDK)tap2dsk -iCLS:$(PROJECT) -c20:3 -n$(PROJECT) BUILD/$(PROJECT).tap OSEHS1.tap OSEHS2.tap OSEHS3.tap OSEHS4.tap OSETSC.tap PETSCIIPJ.tap PETSCIISC.tap PETSCIICS.tap PETSCIICA.tap $(DISK_DSK)
 	$(OSDK)old2mfm $(DISK_DSK)
 	cd $(HXCFE); ./hxcfe -finput:"$(mkfile_path)/$(DISK_DSK)" -foutput:"$(mkfile_path)/$(DISK_HFE)" -conv:HXC_HFE
 
@@ -391,7 +387,7 @@ include/defines.h:
 
 include/oric_core.h:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-11 15:18:32
+#  Last modified 2022-08-14 16:18:42
 #  File has been updated.
 #  Successfully updated.
 
@@ -403,7 +399,7 @@ include/oric_core.h:
 # Not a target:
 src/main.d:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-15 11:09:26
+#  Last modified 2022-08-14 17:24:03
 #  File has been updated.
 #  Successfully updated.
 
@@ -415,25 +411,25 @@ src/main.d:
 # Not a target:
 src/oric_core.d:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-15 11:09:26
+#  Last modified 2022-08-14 17:24:03
 #  File has been updated.
 #  Successfully updated.
 
 # files hash-table stats:
-# Load=19/1024=2%, Rehash=0, Collisions=0/67=0%
+# Load=20/1024=2%, Rehash=0, Collisions=0/70=0%
 # VPATH Search Paths
 
 # No 'vpath' search paths.
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 43 / storage = 451 B / avg = 10 B
-# current buf: size = 8 
-174 B / used = 451 B / count = 43 / avg = 10 B
+# strcache buffers: 1 (0) / strings = 48 / storage = 526 B / avg = 10 B
+# current buf: size = 8174 B / used = 526 B / count 
+ = 48 / avg = 10 B
 
-# strcache performance: lookups = 93 / hit rate = 53%
+# strcache performance: lookups = 100 / hit rate = 52%
 # hash-table stats:
-# Load=43/8192=1%, Rehash=0, Collisions=0/93=0%
-# Finished Make data base on Wed Jun 15 14:50:01 2022
+# Load=48/8192=1%, Rehash=0, Collisions=0/100=0%
+# Finished Make data base on Sun Aug 14 17:25:34 2022
 
  
