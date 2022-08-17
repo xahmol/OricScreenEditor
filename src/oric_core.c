@@ -34,6 +34,16 @@
 #include "defines.h"
 #include "oric_core.h"
 
+// Disk parse function
+void ORIC_DIRParse_start(unsigned char xpos, unsigned char ypos, unsigned char ymax, unsigned char xmax)
+{
+	ORIC_DIRParse_Xpos = xpos;
+	ORIC_DIRParse_Ypos = ypos;
+	ORIC_DIRParse_Ymax = ymax;
+	ORIC_DIRParse_Xmax = xmax;
+	ORIC_DIRParse_start_core();
+}
+
 // Generic screen and scroll routines
 
 void ORIC_HChar(unsigned char row, unsigned char col, unsigned char character, unsigned char length)

@@ -11,6 +11,13 @@
 ; Exports
 
 	.export		_DOSERROR
+	.export		_ORIC_DIRParse_start_core
+	.export		_ORIC_DIRParse_end
+	.export		_ORIC_DIRParse_Xpos
+	.export		_ORIC_DIRParse_Ypos
+	.export		_ORIC_DIRParse_Ymax
+	.export		_ORIC_DIRParse_Xmax
+	.export		_ORIC_DIRParse_diskname
 	.export		_ORIC_HChar_core
 	.export		_ORIC_VChar_core
 	.export		_ORIC_FillArea_core
@@ -87,8 +94,412 @@ _ORIC_tmp3:
 	.res	1
 _ORIC_tmp4:
 	.res	1
+_ORIC_DIRParse_Xpos:
+	.res	1
+_ORIC_DIRParse_Ypos:
+	.res	1
+_ORIC_DIRParse_Ymax:
+	.res	1
+_ORIC_DIRParse_Xmax:
+	.res	1
+_ORIC_DIRParse_diskname:
+	.res	22
+DIRParse_Escapeflag:
+	.res	1
+DIRParse_Count:
+	.res	1
+DIRParse_StringCount:
+	.res	1
+DIRParse_PlotChar:
+	.res	1
+DIRParse_Xnumber:
+	.res	1
+DIRParse_Xcoord:
+	.res	1
+DIRParse_Ycoord:
+	.res	1
+
+; Disk directory parser routines
+
+; ------------------------------------------------------------------------------------------
+_ORIC_DIRParse_start_core:
+; Function to enable directory parser and reroute screen output while DIR is executed
+; Input:	ORIC_DIRParse_Xpos, ORIC_DIRParse_Ypos: Start co-ordinates
+;			ORIC_DIRParse_Ymax: Last Y line to plot
+;			ORIC_DIRParse_Xmax: Number of entries per line
+; Output:	ORIC_DIRParse_Diskname: Name of disk parsed
+;			Output of dir contents to screen at given co-ordinates
+; ------------------------------------------------------------------------------------------
+
+	; Enable overlay RAM
+	jsr	DOSROM							; Call function to toggle overlay RAM
+
+	; Patch SEDORIC print character function to own routine
+	lda #<ORIC_DIRParse_process			; Get low byte of parsing function
+	sta SED_PRINTCHAR					; Store at patch address
+	lda #>ORIC_DIRParse_process			; Get high byte of parsing function
+	sta SED_PRINTCHAR+1					; Store at patch address
+	lda #$60							; Load $60 for oppcode RTS
+	sta SED_PRINTCHAR+2					; Store RTS at patch location
+
+	; Disable overlay RAM
+	jsr	DOSROM							; Call function to toggle overlay RAM
+
+	; Init variables
+	lda #$00							; Load 0 to clear variables
+	sta DIRParse_Escapeflag				; Store in variable
+	sta DIRParse_Xnumber				; Store variable
+	sta DIRParse_StringCount			; Store in variable
+	lda #$13							; Skip 19 bytes in first phase to get to disk name
+	sta DIRParse_Count					; Store as counter
+	lda _ORIC_DIRParse_Xpos				; Load X coord start value
+	sta DIRParse_Xcoord					; Store in variable
+	lda _ORIC_DIRParse_Ypos				; Load X coord start value
+	sta DIRParse_Ycoord					; Store in variable
+	lda #<ORIC_DIRParse_phase0			; Load low byte of first phase routine address
+	sta DP_process_automodifyjmp+1		; Store low byte
+	lda #>ORIC_DIRParse_phase0			; Load high byte of first phase routine address
+	sta DP_process_automodifyjmp+2		; Store high byte
+
+	rts
+
+; ------------------------------------------------------------------------------------------
+DIRParse_nextX:
+; Move a column to the right or go to next line
+; ------------------------------------------------------------------------------------------
+
+	; Increase counter of entries per line
+	inc DIRParse_Xnumber				; Increase number
+	lda DIRParse_Xnumber				; Load in A
+	cmp _ORIC_DIRParse_Xmax				; Compare with maxium number
+	beq DIRParse_Incx					; Branch to increase X
+	
+	; Increase X co-ord by 1 for next entry
+	inc DIRParse_Xcoord					; Increase X coord to skip a space
+	rts
+
+; ------------------------------------------------------------------------------------------
+DIRParse_Incx:
+; Move to next line
+; ------------------------------------------------------------------------------------------
+
+	; Increase Y co-ord by 1 until max line
+	inc DIRParse_Ycoord					; Increase y-coord
+	lda DIRParse_Ycoord					; Load Y-coord
+	cmp _ORIC_DIRParse_Ymax				; Compare with maximum line
+	beq DIRParse_lastlinereached		; Branch to last line reached if equal
+
+	; Reset X values
+	lda #$00							; Load 0 for X counter
+	sta DIRParse_Xnumber				; Store in variable
+	lda _ORIC_DIRParse_Xpos				; Load start X coord
+	sta DIRParse_Xcoord					; Store in variable
+	rts
+
+DIRParse_lastlinereached:
+	lda #<DP_end						; Load low byte of next phase routine address
+	sta DP_process_automodifyjmp+1		; Store low byte
+	lda #>DP_end						; Load high byte of next phase routine address
+	sta DP_process_automodifyjmp+2		; Store high byte
+	rts
+
+; ------------------------------------------------------------------------------------------
+_ORIC_DIRParse_end:
+; Function to disable directory parser and reroute screen output while DIR is executed
+; Input:	
+; ------------------------------------------------------------------------------------------
+
+	; Enable overlay RAM
+	jsr	DOSROM							; Call function to toggle overlay RAM
+
+	; Patch SEDORIC print character function back to original
+	lda #<SED_XROM						; Get low byte of original jump address
+	sta SED_PRINTCHAR					; Store at patch address
+	lda #>SED_XROM						; Get high byte of original jump address
+	sta SED_PRINTCHAR+1					; Store at patch address
+	lda #$12							; Load original value
+	sta SED_PRINTCHAR+2					; Store at patch location
+
+	; Disable overlay RAM
+	jsr	DOSROM							; Call function to toggle overlay RAM
+
+	rts
+
+; ------------------------------------------------------------------------------------------
+ORIC_DIRParse_process:
+; Function to intercept the system char to screen routine
+; Input:	Parses inout character stream via the X register
+; ------------------------------------------------------------------------------------------
+
+	; Initialise
+	sta DIRParse_PlotChar				; Store present char in variable
+;	jsr ORIC_DIRParse_StorMem
+	pha									; Save char to be printed
+	stx _ORIC_tmp1						; Safeguard X
+	sty _ORIC_tmp2						; Safeguard Y
+	php									; Safeguard processor status
+
+	; Jump to routine for actual phase
+DP_process_automodifyjmp:
+	jmp ORIC_DIRParse_phase0
+
+; ------------------------------------------------------------------------------------------
+DP_end:
+; End of dir par processing and restore to old state and destination
+; ------------------------------------------------------------------------------------------
+	; Restore old state
+	plp									; Restore processor statis
+	pla									; Restore char to be printed
+	ldx _ORIC_tmp1						; Restore X register
+	ldy	_ORIC_tmp2						; Restore Y register
+
+	; Jump to XROM routine to return to SEDORIC gracefully
+	jsr SED_XROM						; Jump to XROM routine
+	.byte $10,$cd,$10,$cd				; Data for XROM
+
+	rts
+
+; Debugging: Dumping parse to memory
+; ORIC_DIRParse_StorMem:
+; 	sta $9000
+; 	inc ORIC_DIRParse_StorMem+1
+; 	beq ORIC_DIRParse_StorMemNext
+; 	rts
+; ORIC_DIRParse_StorMemNext:
+; 	inc ORIC_DIRParse_StorMem+2
+; 	rts
+
+; ------------------------------------------------------------------------------------------
+ORIC_DIRParse_phase0:
+; First phase of dirparser: skip dir header to reach disk name
+; ------------------------------------------------------------------------------------------
+
+	; Decrease counter and branch if end of phase reached
+	dec DIRParse_Count					; Decrease counter
+	bne DP_endphase0					; If not 0, end of phase routine
+	lda #<ORIC_DIRParse_phase1			; Load low byte of next phase routine address
+	sta DP_process_automodifyjmp+1		; Store low byte
+	lda #>ORIC_DIRParse_phase1			; Load high byte of next phase routine address
+	sta DP_process_automodifyjmp+2		; Store high byte
+	lda #$15							; Set lenghth of diskname
+	sta DIRParse_Count					; Set new counter
+DP_endphase0:
+	jmp DP_end							; Jump to end
+
+; ------------------------------------------------------------------------------------------
+ORIC_DIRParse_phase1:
+; Second phase of dirparser: get disk name
+; ------------------------------------------------------------------------------------------
+
+	; Load character
+	lda DIRParse_PlotChar				; Load the character
+
+	; Check for escape
+	cmp #$1b							; Check for escape
+	bne DP_phase1_next1					; Branch if no escape
+	lda #$01							; Load 1 to set escaoe flag
+	sta DIRParse_Escapeflag				; Save in variable
+	jmp DP_phase1_next3					; End of routine
+
+DP_phase1_next1:
+	; Check for escape flag
+	lda DIRParse_Escapeflag				; Load escape flag
+	cmp #$01							; Check if flag is set
+	bne DP_phase1_next2					; Branch if flag is not set
+	lda #$00							; Load 0 to clear escaoe flag
+	sta DIRParse_Escapeflag				; Save in variable
+	jmp DP_phase1_next3					; End of routine				
+
+DP_phase1_next2:
+	; Store character in string
+	lda DIRParse_PlotChar				; Load the character
+	ldy DIRParse_StringCount			; Load string count as Y index
+	sta _ORIC_DIRParse_diskname,y		; Store character in string
+	inc DIRParse_StringCount			; Increase string counter
+
+DP_phase1_next3:
+	; Decrease counter and branch if end of phase reached
+	dec DIRParse_Count					; Decrease counter
+	bne DP_endphase1					; If not 0, end of phase routine
+	lda #<ORIC_DIRParse_phase2			; Load low byte of next phase routine address
+	sta DP_process_automodifyjmp+1		; Store low byte
+	lda #>ORIC_DIRParse_phase2			; Load high byte of next phase routine address
+	sta DP_process_automodifyjmp+2		; Store high byte
+	lda #$09							; Set lenghth of filename
+	sta DIRParse_Count					; Set new counter
+DP_endphase1:
+	jmp DP_end							; Jump to end
+
+; ------------------------------------------------------------------------------------------
+ORIC_DIRParse_phase2:
+; Third phase of dirparser: get filename left column
+; ------------------------------------------------------------------------------------------
+
+	; Load and plot character
+	lda DIRParse_PlotChar				; Load the character
+
+	; See if end of dir is reached
+	cmp #$2A							; Compare if * for end of dir list
+	bne DP_phase2_next1					; Branch if not yet end
+	lda #<DP_end						; Load low byte of next phase routine address
+	sta DP_process_automodifyjmp+1		; Store low byte
+	lda #>DP_end						; Load high byte of next phase routine address
+	sta DP_process_automodifyjmp+2		; Store high byte
+	jmp DP_end							; Jump to end
+
+DP_phase2_next1:
+	; Plot character
+	jsr ORIC_Plot						; Plot character at present coords
+
+	; Decrease counter and branch if end of phase reached
+	dec DIRParse_Count					; Decrease counter
+	bne DP_endphase2					; If not 0, end of phase routine
+	jsr DIRParse_nextX					; Move to next column
+	lda #<ORIC_DIRParse_phase3			; Load low byte of next phase routine address
+	sta DP_process_automodifyjmp+1		; Store low byte
+	lda #>ORIC_DIRParse_phase3			; Load high byte of next phase routine address
+	sta DP_process_automodifyjmp+2		; Store high byte
+	lda #$09							; Set lenghth to skip
+	sta DIRParse_Count					; Set new counter
+DP_endphase2:
+	jmp DP_end							; Jump to end
+
+; ------------------------------------------------------------------------------------------
+ORIC_DIRParse_phase3:
+; Fourth phase of dirparser: skip file extension and block length from left column
+; ------------------------------------------------------------------------------------------
+
+	; Decrease counter and branch if end of phase reached
+	dec DIRParse_Count					; Decrease counter
+	bne DP_endphase3					; If not 0, end of phase routine
+	lda #<ORIC_DIRParse_phase4			; Load low byte of next phase routine address
+	sta DP_process_automodifyjmp+1		; Store low byte
+	lda #>ORIC_DIRParse_phase4			; Load high byte of next phase routine address
+	sta DP_process_automodifyjmp+2		; Store high byte
+	lda #$02							; Set lenghth to skip
+	sta DIRParse_Count					; Set new counter
+DP_endphase3:
+	jmp DP_end							; Jump to end
+
+; ------------------------------------------------------------------------------------------
+ORIC_DIRParse_phase4:
+; Fifth phase of dirparser: check for end of dir or else go to right column
+; ------------------------------------------------------------------------------------------
+
+	; Load character
+	lda DIRParse_PlotChar				; Load the character
+
+	; See if end of dir is reached
+	cmp #$2A							; Compare if * for end of dir list
+	bne DP_phase4_next1					; Branch if not yet end
+	lda #<DP_end						; Load low byte of next phase routine address
+	sta DP_process_automodifyjmp+1		; Store low byte
+	lda #>DP_end						; Load high byte of next phase routine address
+	sta DP_process_automodifyjmp+2		; Store high byte
+	jmp DP_end							; Jump to end
+
+DP_phase4_next1:
+	; Decrease counter and branch if end of phase reached
+	dec DIRParse_Count					; Decrease counter
+	bne DP_endphase4					; If not 0, end of phase routine
+	lda #<ORIC_DIRParse_phase5			; Load low byte of next phase routine address
+	sta DP_process_automodifyjmp+1		; Store low byte
+	lda #>ORIC_DIRParse_phase5			; Load high byte of next phase routine address
+	sta DP_process_automodifyjmp+2		; Store high byte
+	lda #$09							; Set lenghth of filename
+	sta DIRParse_Count					; Set new counter
+DP_endphase4:
+	jmp DP_end							; Jump to end
+
+; ------------------------------------------------------------------------------------------
+ORIC_DIRParse_phase5:
+; Fifth phase of dirparser: get filename right column
+; ------------------------------------------------------------------------------------------
+
+	; Load and plot character
+	lda DIRParse_PlotChar				; Load the character
+
+	; Is this the first character of the right column?
+	ldx DIRParse_Count					; Load counter in X
+	cpx #$09							; Check if counter still is at 9
+	bne DP_phase5_next1					; Branch if not first character
+
+	; See if end of right column is reached
+	cmp #$20							; Compare if SPACE for end of right column
+	bne DP_phase5_next1					; Branch if not yet end
+	lda #<ORIC_DIRParse_phase9			; Load low byte of next phase routine address
+	sta DP_process_automodifyjmp+1		; Store low byte
+	lda #>ORIC_DIRParse_phase9			; Load high byte of next phase routine address
+	sta DP_process_automodifyjmp+2		; Store high byte
+	jmp DP_end							; Jump to end
+
+DP_phase5_next1:
+	; Plot character
+	jsr ORIC_Plot						; Plot character at present coords
+
+	; Decrease counter and branch if end of phase reached
+	dec DIRParse_Count					; Decrease counter
+	bne DP_endphase5					; If not 0, end of phase routine
+	jsr DIRParse_nextX					; Move to next column
+	lda #<ORIC_DIRParse_phase9			; Load low byte of next phase routine address
+	sta DP_process_automodifyjmp+1		; Store low byte
+	lda #>ORIC_DIRParse_phase9			; Load high byte of next phase routine address
+	sta DP_process_automodifyjmp+2		; Store high byte
+	lda #$09							; Set lenghth to skip to left column again
+	sta DIRParse_Count					; Set new counter
+DP_endphase5:
+	jmp DP_end							; Jump to end
+
+; ------------------------------------------------------------------------------------------
+ORIC_DIRParse_phase9:
+; Skip rest of right column on empty line in column, or skip to reach left column
+; ------------------------------------------------------------------------------------------
+
+	; Decrease counter and branch if end of phase reached
+	dec DIRParse_Count					; Decrease counter
+	bne DP_endphase9					; If not 0, end of phase routine
+	lda #<ORIC_DIRParse_phase2			; Load low byte of next phase routine address
+	sta DP_process_automodifyjmp+1		; Store low byte
+	lda #>ORIC_DIRParse_phase2			; Load high byte of next phase routine address
+	sta DP_process_automodifyjmp+2		; Store high byte
+	lda #$09							; Set lenghth of filename
+	sta DIRParse_Count					; Set new counter
+DP_endphase9:
+	jmp DP_end							; Jump to end
 
 ; Screen and scrolling core routines
+
+; ------------------------------------------------------------------------------------------
+ORIC_Plot:
+; Function to plot a char at X resp Y coord
+; Input:	A = char to plot
+;			_ORIC_DIRParse_Xpos, _ORIC_DIRParse_Ypos = Co-ordinate to plot at
+; ------------------------------------------------------------------------------------------
+
+	; Set address at begin of Y line
+	ldy DIRParse_Ycoord					; Load Y co-oord as index
+	lda OricScreenAddress_lb,Y			; Load corresponding low byte screen address
+	sta ORIC_Plot_selfmodify+1			; Self modify address
+	lda OricScreenAddress_hb,Y			; Load corresponding high byte screen address
+	sta ORIC_Plot_selfmodify+2			; Self modify address
+
+	; Add X coord
+	clc									; Clear carry
+	lda ORIC_Plot_selfmodify+1			; Load screen address low byte begin line
+	adc DIRParse_Xcoord					; Add X co-ord with carry to low byte
+	sta ORIC_Plot_selfmodify+1			; Store new value
+	lda ORIC_Plot_selfmodify+2			; Load screen address high byte begin line
+	adc #$00							; Add zero with carry
+	sta ORIC_Plot_selfmodify+2			; Store new value
+
+	; Plot char
+	lda DIRParse_PlotChar				; Load char to plot
+ORIC_Plot_selfmodify:
+	sta $bb80							; Store at calculated self modifying address
+
+	; Move to right
+	inc DIRParse_Xcoord					; Increase X coo-ord by one
+	rts
 
 ; ------------------------------------------------------------------------------------------
 _ORIC_HChar_core:
@@ -475,3 +886,65 @@ _ORIC_RestoreAlternateCharset:
 
     jsr ROM_ALTCHARS                    ; Jump to ROM routine
     rts
+
+; Table for beginning of line screen addresses
+
+OricScreenAddress_lb:
+	.byte $80
+	.byte $A8
+	.byte $D0
+	.byte $F8
+	.byte $20
+	.byte $48
+	.byte $70
+	.byte $98
+	.byte $C0
+	.byte $E8
+	.byte $10
+	.byte $38
+	.byte $60
+	.byte $88
+	.byte $B0
+	.byte $D8
+	.byte $00
+	.byte $28
+	.byte $50
+	.byte $78
+	.byte $A0
+	.byte $C8
+	.byte $F0
+	.byte $18
+	.byte $40
+	.byte $68
+	.byte $90
+	.byte $B8
+
+OricScreenAddress_hb:
+	.byte $BB
+	.byte $BB
+	.byte $BB
+	.byte $BB
+	.byte $BC
+	.byte $BC
+	.byte $BC
+	.byte $BC
+	.byte $BC
+	.byte $BC
+	.byte $BD
+	.byte $BD
+	.byte $BD
+	.byte $BD
+	.byte $BD
+	.byte $BD
+	.byte $BE
+	.byte $BE
+	.byte $BE
+	.byte $BE
+	.byte $BE
+	.byte $BE
+	.byte $BE
+	.byte $BF
+	.byte $BF
+	.byte $BF
+	.byte $BF
+	.byte $BF

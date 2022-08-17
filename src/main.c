@@ -2157,43 +2157,45 @@ void highlightfile(unsigned char xpos, unsigned char ypos, unsigned char type)
     switch (type)
     {
     case 2:
-        cputsxy(15,5,"(Project)");
+        cputsxy(30,5,"(Project)");
         break;
     
     case 3:
-        cputsxy(15,5,"(Screen) ");
+        cputsxy(30,5,"(Screen) ");
         break;
 
     case 4:
-        cputsxy(15,5,"(StdChar)");
+        cputsxy(30,5,"(StdChar)");
         break;
 
     case 5:
-        cputsxy(15,5,"(AltChar)");
+        cputsxy(30,5,"(AltChar)");
         break;
     
     default:
-        cputsxy(15,5,"         ");
+        cputsxy(30,5,"         ");
         break;
     }
 }
 
 int filepickerfromdir(char* headertext)
 {
-    unsigned char x=2;
-    unsigned char y=9;
+    unsigned char x=4;
+    unsigned char y=6;
     unsigned char key,type,changed;
 
-    windowsave(0,40,0);
-    basic("CLS:PAPER7:INK0");
-    printf("\n\n%s\n\n",headertext);
-    printf("Choose file:\n");
+    windownew(2,2,23,38,0);
+    cputsxy(4,3,headertext);
 
+    ORIC_DIRParse_start(4,6,26,3);
     basic("!DIR \"*.BIN\"");
+    ORIC_DIRParse_end();
+    gotoxy(4,5);
+    cprintf("Disk: %s",ORIC_DIRParse_diskname);
 
     if(!filenamegrabber(x,y))
     {
-        cputsxy(2,5,"No valid files to load. Press key.");
+        cputsxy(4,6,"No valid files to load. Press key.");
         cgetc();
         return -1;
     }
@@ -2213,13 +2215,17 @@ int filepickerfromdir(char* headertext)
             break;
         
         case CH_CURS_UP:
-            if(y>9) { y--; }
+            if(y>6) { y--; }
             changed=1;
             break;
 
         case CH_CURS_RIGHT:
+            if(x<24) { x+=10; }
+            changed=1;
+            break;
+
         case CH_CURS_LEFT:
-            x=(x==2)?22:2;
+            if(x>4) { x-=10; }
             changed=1;
             break;
         
@@ -2235,13 +2241,13 @@ int filepickerfromdir(char* headertext)
             }
             else
             {
-                y=9;
-                x=(x==2)?22:2;
+                y=6;
+                x=4;
             }
         }
     } while (key!=CH_ENTER && key!=CH_ESC);
 
-    ORIC_FillArea(5,2,CH_SPACE,38,20);
+    ORIC_FillArea(5,4,CH_SPACE,34,20);
 
     if(key==CH_ESC)
     {
@@ -2249,8 +2255,9 @@ int filepickerfromdir(char* headertext)
     }
     else
     {
-        gotoxy(2,5);
-        cprintf("File selected: %s.BIN",filename);
+        cputsxy(4,5,"File selected:");
+        gotoxy(4,6);
+        cprintf("%s.BIN",filename);
         return type;
     }
 }
