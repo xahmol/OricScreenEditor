@@ -523,13 +523,15 @@ unsigned char menupulldown(unsigned char xpos, unsigned char ypos, unsigned char
             break;
         
         case CH_CURS_LEFT:
-            exit = 1;
-            menuchoice = 18;
-            break;
-        
         case CH_CURS_RIGHT:
-            exit = 1;
-            menuchoice = 19;
+            if(menunumber<5)
+            {
+                exit = 1;
+                menuchoice = (key==CH_CURS_LEFT)?18:19;
+                gotoxy(menubarcoords[menunumber-1]-1,0);
+                cputc(A_BGGREEN);
+                cprintf("%s",menubartitles[menunumber-1]);
+            }
             break;
 
         case CH_CURS_DOWN:
