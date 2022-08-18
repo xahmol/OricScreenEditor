@@ -1,7 +1,6 @@
 make.exe all --print-data-base --no-builtin-variables --no-builtin-rules --question
 process_begin: CreateProcess(NULL, dirname d:/Git/OricScreenEditor/Makefile, ...) failed.
 Makefile:25: pipe: No error
-
 process_begin: CreateProcess(NULL, pwd, ...) failed.
 Makefile:29: pipe: No error
 
@@ -11,9 +10,8 @@ Makefile:29: pipe: No error
 # License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
- 
 
-# Make data base, printed on Sun Aug 14 17:25:34 2022
+# Make data base, printed on Thu Aug 18 08:58:56 2022
 
 # Variables
 
@@ -46,7 +44,7 @@ HXCFE := /home/xahmol/hxcfloppyemu-cod/HxCFloppyEmulator/HxCFloppyEmulator_cmdli
 # environment
 DOKANLIBRARY1_LIBRARYPATH_X64 = C:\Program Files\Dokan\Dokan Library-1.4.1\lib\
 # environment
-CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_30316_MHTQGSHEOZBTHNIN
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_16204_LMJASCEMIDTTSGPT
 # environment
 VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # default
@@ -108,7 +106,7 @@ MAKEFILE_LIST := Makefile src/main.d src/oric_core.d
 # automatic
 @F = $(notdir $@)
 # environment
-VSCODE_PID = 30316
+VSCODE_PID = 16204
 # automatic
 ?D = $(patsubst %/,%,$(patsubst %\,%,$(dir $?)))
 # environment
@@ -120,8 +118,7 @@ PROJECT_DIR :=
 # automatic
 <D = $(patsubst %/,%,$(patsubst %\,%,$(dir $<)))
 # environment
-VSCODE_NLS_CONFIG = {"locale":"nl","ava 
-ilableLanguages":{},"_languagePackSupport":true}
+VSCODE_NLS_CONFIG = {"locale":"nl","availableLanguages":{},"_languagePackSupport":true}
 # environment
 ONEDRIVECONSUMER = C:\Users\xande\OneDrive
 # default
@@ -184,6 +181,8 @@ USERDOMAIN = XANDERPC2021
 GNUMAKEFLAGS := 
 # environment
 OS = Windows_NT
+# environment
+__COMPAT_LAYER = DetectorsAppHealth
 # environment
 DOKANLIBRARY1 = C:\Program Files\Dokan\Dokan Library-1.4.1\
 # makefile (from 'Makefile', line 32)
@@ -251,7 +250,7 @@ SOURCES = src/main.c src/oric_core.c
 # environment
 PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 165 Stepping 5, GenuineIntel
 # variable set hash-table stats:
-# Load=116/1024=11%, Rehash=0, Collisions=12/179=7%
+# Load=117/1024=11%, Rehash=0, Collisions=12/180=7%
 
 # Pattern-specific Variable Values
 
@@ -259,7 +258,7 @@ PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 165 Stepping 5, GenuineIntel
 
 # Directories
 
-# src (key d:/Git/OricScreenEditor/src, mtime 1660490643): No files, no impossibilities so far.
+# src (key d:/Git/OricScreenEditor/src, mtime 1660764992): No files, no impossibilities so far.
 # . (key d:/Git/OricScreenEditor, mtime 1660490580): 25 files, no impossibilities.
 
 # 25 files, no impossibilities in 2 directories.
@@ -275,7 +274,7 @@ PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 165 Stepping 5, GenuineIntel
 
 BUILD/OSE.bin: src/main.o src/oric_core.o
 #  Implicit rule search has not been done.
-#  Last modified 2022-08-14 17:24:03
+#  Last modified 2022-08-17 21:36:32
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'Makefile', line 76):
@@ -290,8 +289,7 @@ Makefile:
 
 src/oric_core.c:
 #  Implicit rule search has been done.
-#  L 
-ast modified 2022-08-14 16:19:25
+#  Last modified 2022-08-17 11:37:43
 #  File has been updated.
 #  Successfully updated.
 
@@ -313,7 +311,7 @@ include/osdklib.h:
 src/oric_core.o: src/oric_core.c src/oric_core.c include/defines.h include/osdklib.h include/oric_core.h
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'src/oric_core'
-#  Last modified 2022-08-14 17:24:03
+#  Last modified 2022-08-17 21:36:32
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'Makefile', line 72):
@@ -327,14 +325,14 @@ include/libbasic.h:
 
 src/main.c:
 #  Implicit rule search has been done.
-#  Last modified 2022-08-14 17:01:06
+#  Last modified 2022-08-17 21:09:21
 #  File has been updated.
 #  Successfully updated.
 
 src/main.o: src/main.c src/main.c include/defines.h include/osdklib.h include/oric_core.h include/libbasic.h
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'src/main'
-#  Last modified 2022-08-14 17:24:03
+#  Last modified 2022-08-17 21:36:32
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'Makefile', line 72):
@@ -370,7 +368,7 @@ run-debug:
 
 BUILD/OSE.dsk: BUILD/OSE.bin
 #  Implicit rule search has not been done.
-#  Last modified 2022-08-14 17:24:03
+#  Last modified 2022-08-17 21:36:32
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'Makefile', line 80):
@@ -387,7 +385,7 @@ include/defines.h:
 
 include/oric_core.h:
 #  Implicit rule search has been done.
-#  Last modified 2022-08-14 16:18:42
+#  Last modified 2022-08-17 21:20:17
 #  File has been updated.
 #  Successfully updated.
 
@@ -399,7 +397,7 @@ include/oric_core.h:
 # Not a target:
 src/main.d:
 #  Implicit rule search has been done.
-#  Last modified 2022-08-14 17:24:03
+#  Last modified 2022-08-17 21:36:32
 #  File has been updated.
 #  Successfully updated.
 
@@ -411,7 +409,7 @@ src/main.d:
 # Not a target:
 src/oric_core.d:
 #  Implicit rule search has been done.
-#  Last modified 2022-08-14 17:24:03
+#  Last modified 2022-08-17 21:36:32
 #  File has been updated.
 #  Successfully updated.
 
@@ -424,12 +422,11 @@ src/oric_core.d:
 # No general ('VPATH' variable) search path.
 
 # strcache buffers: 1 (0) / strings = 48 / storage = 526 B / avg = 10 B
-# current buf: size = 8174 B / used = 526 B / count 
- = 48 / avg = 10 B
+# current buf: size = 8174 B / used = 526 B / count = 48 / avg = 10 B
 
 # strcache performance: lookups = 100 / hit rate = 52%
 # hash-table stats:
 # Load=48/8192=1%, Rehash=0, Collisions=0/100=0%
-# Finished Make data base on Sun Aug 14 17:25:34 2022
+# Finished Make data base on Thu Aug 18 08:58:56 2022
 
  

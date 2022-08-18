@@ -591,9 +591,12 @@ unsigned char menumain()
                 key = cgetc();
             } while (key != CH_ENTER && key != CH_CURS_LEFT && key != CH_CURS_RIGHT && key != CH_ESC && key != CH_STOP);
 
-            gotoxy(menubarcoords[menubarchoice-1]-1,0);
-            cputc(A_BGGREEN);
-            cprintf("%s",menubartitles[menubarchoice-1]);
+            if(key==CH_CURS_LEFT || key==CH_CURS_RIGHT)
+            {
+                gotoxy(menubarcoords[menubarchoice-1]-1,0);
+                cputc(A_BGGREEN);
+                cprintf("%s",menubartitles[menubarchoice-1]);
+            }
 
             if(key==CH_CURS_LEFT)
             {

@@ -233,7 +233,7 @@ ORIC_DIRParse_process:
 
 	; Initialise
 	sta DIRParse_PlotChar				; Store present char in variable
-;	jsr ORIC_DIRParse_StorMem
+	jsr ORIC_DIRParse_StorMem
 	pha									; Save char to be printed
 	stx _ORIC_tmp1						; Safeguard X
 	sty _ORIC_tmp2						; Safeguard Y
@@ -260,14 +260,14 @@ DP_end:
 	rts
 
 ; Debugging: Dumping parse to memory
-; ORIC_DIRParse_StorMem:
-; 	sta $9000
-; 	inc ORIC_DIRParse_StorMem+1
-; 	beq ORIC_DIRParse_StorMemNext
-; 	rts
-; ORIC_DIRParse_StorMemNext:
-; 	inc ORIC_DIRParse_StorMem+2
-; 	rts
+ORIC_DIRParse_StorMem:
+	sta $9000
+	inc ORIC_DIRParse_StorMem+1
+	beq ORIC_DIRParse_StorMemNext
+	rts
+ORIC_DIRParse_StorMemNext:
+	inc ORIC_DIRParse_StorMem+2
+	rts
 
 ; ------------------------------------------------------------------------------------------
 ORIC_DIRParse_phase0:
