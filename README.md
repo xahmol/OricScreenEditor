@@ -7,6 +7,8 @@ Screen editor for the Oric Atmos
 
 [Introduction](#introduction)
 
+[Known issues](#known-issues)
+
 [Start program](#start-program)
 
 [Main mode](#main-mode)
@@ -69,6 +71,9 @@ Main features of the program:
 - Move mode to scroll the screen contents (due to memory constraints only for the 40x27 viewport)
 - Palette mode, including visual charmap mode, to visually select characters and colors
 - Favorite slots to quickly select 10 favorite characters
+
+## Known issues
+- Filepicker routine only is properly working with SEDORIC3 disks created by the TAP2DSK tool from OSDK. If you want to import screens or charsets from other disks, please copy them to a TAP2DSK created image first.
 
 ## Start program
 ([Back to contents](#contents))
