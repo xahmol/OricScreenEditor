@@ -45,6 +45,10 @@ Link to latest builds:
 - [.DSK disk image](https://github.com/xahmol/OricScreenEditor/raw/main/BUILD/OSE.dsk)
 - [.HFE disk image](https://github.com/xahmol/OricScreenEditor/raw/main/BUILD/OSE.hfe)
 
+Version v099-20220824-1345:
+- File picker added
+- Minor other tweaks and fixes
+
 Version v099-20220615-1454:
 - First released beta version based on [VDCSE](https://github.com/xahmol/VDCScreenEdit) version v099-20220324-1527
 
