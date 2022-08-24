@@ -269,9 +269,9 @@ In case of a file error, a popup will be shown with the error number.
 
 *Load screen*
 
-With this option you can load a screen from disk. Dialogue for this option is very similar to the Save screen option above. Filename will be asked, but next to that the width and height in characters will be asked as that can not be read from a standard screen file.
+With this option you can load a screen from disk. The filename to be loaded can be selected with the file picker showing the files on the disc. Next to the disk name, if the name convention is recognized, filetype is shown for reference. After selecting the file, the width and height in characters will be asked as that can not be read from a standard screen file.
 
-![Load screen](https://github.com/xahmol/OricScreenEditor/blob/main/screenshots/OSE%20File%20menu%20-%20load.png?raw=true)
+![Load screen](https://github.com/xahmol/OricScreenEditor/blob/main/screenshots/OSE%20File%20menu%20-%20filepicker.png?raw=true)
 
 *Save project*
 
@@ -280,9 +280,7 @@ Similar to save screen, but with this option also the canvas metadata (width, he
 ![Save project](https://github.com/xahmol/OricScreenEditor/blob/main/screenshots/OSE%20File%20menu%20-%20projsave.png?raw=true)
 
 *Load project*
-Loads a project: the metadata, the screen and the charsets. Provide the filename without the two letter suffix pj,sc,cs and ca). As the canvas width and height is now read from the metadata, no user input on canvas size is needed.
-
-![Load project](https://github.com/xahmol/OricScreenEditor/blob/main/screenshots/OSE%20File%20menu%20-%20projload.png?raw=true)
+Loads a project: the metadata, the screen and the charsets. Provide the filename with the filepicker (same as with Load Screen). A pop-up will be shown if the filename selected does not meet the name convention for a project (filename has to end with PJ). As the canvas width and height is now read from the metadata, no user input on canvas size is needed.
 
 *Save combined*
 
