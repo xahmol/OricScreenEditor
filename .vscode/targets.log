@@ -1,6 +1,7 @@
 make.exe all --print-data-base --no-builtin-variables --no-builtin-rules --question
 process_begin: CreateProcess(NULL, dirname d:/Git/OricScreenEditor/Makefile, ...) failed.
 Makefile:25: pipe: No error
+
 process_begin: CreateProcess(NULL, pwd, ...) failed.
 Makefile:29: pipe: No error
 
@@ -11,7 +12,7 @@ Makefile:29: pipe: No error
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Thu Aug 18 08:58:56 2022
+# Make data base, printed on Wed Aug 24 13:32:52 2022
 
 # Variables
 
@@ -44,7 +45,7 @@ HXCFE := /home/xahmol/hxcfloppyemu-cod/HxCFloppyEmulator/HxCFloppyEmulator_cmdli
 # environment
 DOKANLIBRARY1_LIBRARYPATH_X64 = C:\Program Files\Dokan\Dokan Library-1.4.1\lib\
 # environment
-CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_16204_LMJASCEMIDTTSGPT
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_21572_GQDHCPYKKTGBSBUJ
 # environment
 VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # default
@@ -106,7 +107,7 @@ MAKEFILE_LIST := Makefile src/main.d src/oric_core.d
 # automatic
 @F = $(notdir $@)
 # environment
-VSCODE_PID = 16204
+VSCODE_PID = 21572
 # automatic
 ?D = $(patsubst %/,%,$(patsubst %\,%,$(dir $?)))
 # environment
@@ -182,8 +183,6 @@ GNUMAKEFLAGS :=
 # environment
 OS = Windows_NT
 # environment
-__COMPAT_LAYER = DetectorsAppHealth
-# environment
 DOKANLIBRARY1 = C:\Program Files\Dokan\Dokan Library-1.4.1\
 # makefile (from 'Makefile', line 32)
 DISK_HFE := BUILD/OSE.hfe
@@ -250,7 +249,7 @@ SOURCES = src/main.c src/oric_core.c
 # environment
 PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 165 Stepping 5, GenuineIntel
 # variable set hash-table stats:
-# Load=117/1024=11%, Rehash=0, Collisions=12/180=7%
+# Load=116/1024=11%, Rehash=0, Collisions=12/179=7%
 
 # Pattern-specific Variable Values
 
@@ -258,7 +257,7 @@ PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 165 Stepping 5, GenuineIntel
 
 # Directories
 
-# src (key d:/Git/OricScreenEditor/src, mtime 1660764992): No files, no impossibilities so far.
+# src (key d:/Git/OricScreenEditor/src, mtime 1660894930): No files, no impossibilities so far.
 # . (key d:/Git/OricScreenEditor, mtime 1660490580): 25 files, no impossibilities.
 
 # 25 files, no impossibilities in 2 directories.
@@ -274,7 +273,7 @@ PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 165 Stepping 5, GenuineIntel
 
 BUILD/OSE.bin: src/main.o src/oric_core.o
 #  Implicit rule search has not been done.
-#  Last modified 2022-08-17 21:36:32
+#  Last modified 2022-08-19 09:42:10
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'Makefile', line 76):
@@ -311,7 +310,7 @@ include/osdklib.h:
 src/oric_core.o: src/oric_core.c src/oric_core.c include/defines.h include/osdklib.h include/oric_core.h
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'src/oric_core'
-#  Last modified 2022-08-17 21:36:32
+#  Last modified 2022-08-19 09:42:10
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'Makefile', line 72):
@@ -325,14 +324,14 @@ include/libbasic.h:
 
 src/main.c:
 #  Implicit rule search has been done.
-#  Last modified 2022-08-17 21:09:21
+#  Last modified 2022-08-18 09:33:19
 #  File has been updated.
 #  Successfully updated.
 
 src/main.o: src/main.c src/main.c include/defines.h include/osdklib.h include/oric_core.h include/libbasic.h
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'src/main'
-#  Last modified 2022-08-17 21:36:32
+#  Last modified 2022-08-19 09:42:09
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'Makefile', line 72):
@@ -368,7 +367,7 @@ run-debug:
 
 BUILD/OSE.dsk: BUILD/OSE.bin
 #  Implicit rule search has not been done.
-#  Last modified 2022-08-17 21:36:32
+#  Last modified 2022-08-19 09:42:10
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'Makefile', line 80):
@@ -397,7 +396,7 @@ include/oric_core.h:
 # Not a target:
 src/main.d:
 #  Implicit rule search has been done.
-#  Last modified 2022-08-17 21:36:32
+#  Last modified 2022-08-19 09:42:09
 #  File has been updated.
 #  Successfully updated.
 
@@ -409,7 +408,7 @@ src/main.d:
 # Not a target:
 src/oric_core.d:
 #  Implicit rule search has been done.
-#  Last modified 2022-08-17 21:36:32
+#  Last modified 2022-08-19 09:42:10
 #  File has been updated.
 #  Successfully updated.
 
@@ -427,6 +426,6 @@ src/oric_core.d:
 # strcache performance: lookups = 100 / hit rate = 52%
 # hash-table stats:
 # Load=48/8192=1%, Rehash=0, Collisions=0/100=0%
-# Finished Make data base on Thu Aug 18 08:58:56 2022
+# Finished Make data base on Wed Aug 24 13:32:52 2022
 
  
